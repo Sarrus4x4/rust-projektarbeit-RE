@@ -1,41 +1,42 @@
 // Enum with all types of RE
-pub enum RE_Type {
-    eps,
-    phi,
-    c, //{val: char} could be used to save the the value of the char easily 
-    alt,
-    conc,
-    star
+pub enum ReType {
+    Eps,
+    Phi,
+    C, //{val: char} could be used to save the the value of the char easily 
+    Alt,
+    Conc,
+    Star
 }
 
 // Struct of a regular expression with a left and right value
+// left and right should be of type RE but this creates an endless loop 
 pub struct RE <T,J> {
     pub left: T ,
     pub right: J,
-    pub re_type: RE_Type
+    pub re_type: ReType
 }
 // Generation of basic methods to work with regular expressions
-pub trait basic_methods {
-    fn of_type (&self) -> RE_Type;
+pub trait BasicMethods {
+    fn of_type (&self) -> ReType;
     fn pretty (&self) -> String;
     fn contains_eps (&self) -> bool;
 }
-// Implementation of said basic methods 
-impl <T, J> basic_methods for RE<T, J> {
-    fn of_type (&self) -> RE_Type{
-        //only did this because "self.re_type" would not work!
-        if matches!(self.re_type, RE_Type::eps){
-            RE_Type::eps
-        } else if matches!(self.re_type, RE_Type::phi){
-            RE_Type::phi
-        } else if matches!(self.re_type, RE_Type::c ){
-            RE_Type::c
-        } else if matches!(self.re_type, RE_Type::alt){
-            RE_Type::alt
-        } else if matches!(self.re_type, RE_Type::conc){
-            RE_Type::conc
+// Implementation of the basic methods 
+impl <T, J> BasicMethods for RE<T, J> {
+    fn of_type (&self) -> ReType{
+        //only did this because "self.ReType" would not work!
+        if matches!(self.re_type, ReType::Eps){
+            ReType::Eps
+        } else if matches!(self.re_type, ReType::Phi){
+            ReType::Phi
+        } else if matches!(self.re_type, ReType::C ){
+            ReType::C
+        } else if matches!(self.re_type, ReType::Alt){
+            ReType::Alt
+        } else if matches!(self.re_type, ReType::Conc){
+            ReType::Conc
         } else {
-            RE_Type::star
+            ReType::Star
         }
     }
     fn pretty (&self) -> String{
@@ -43,17 +44,42 @@ impl <T, J> basic_methods for RE<T, J> {
     }
     fn contains_eps (&self) -> bool{
         let mut contains_eps = false;
-        if matches!(self.of_type(), RE_Type::phi) || matches!(self.of_type(), RE_Type::eps) { 
+        if matches!(self.of_type(), ReType::Eps) { // || matches!(self.of_type(), ReType::Phi) could be added for a contains_Phi() function 
             contains_eps = true;
         }
         contains_eps
     }
 }
 
+// Should i use structs for all types of RE?
+
+// pub struct Eps {
+//     //empty?
+// }
+// pub struct Phi {
+//     //empty?
+// }
+// pub struct C {
+//     val: char
+// }
+// pub struct Alt {
+//     pub left: RE ,
+//     pub right: RE,
+// }
+// pub struct Conc {
+//     pub left: RE ,
+//     pub right: RE,
+// }
+// pub struct Star {
+//     pub val_to_star: RE
+// }
+
+
 pub fn run(){ 
        let re1 = RE{
            left: 's',
            right: "os",
-           re_type: RE_Type::conc
+           re_type: ReType::Conc
        };
+       println!("Check if the RE is of type eps: {}",re1.contains_eps())
     }
