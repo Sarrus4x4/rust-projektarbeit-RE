@@ -1,3 +1,5 @@
+//#[derive(Debug)]
+
 // Enum with all types of RE
 pub enum ReType {
     Eps,
@@ -7,11 +9,25 @@ pub enum ReType {
     Conc,
     Star
 }
+//Display for Enum ReType so it can be pritnted 
+use std::fmt;
+impl fmt::Display for ReType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match *self {
+        ReType::Eps => write!(f, "Eps"),
+        ReType::Phi => write!(f, "Phi"),
+        ReType::C => write!(f, "C"),
+        ReType::Alt => write!(f, "Alt"),
+        ReType::Conc => write!(f, "Conc"),
+        ReType::Star => write!(f, "Star")
+       }
+    }
+}
 
 // Struct of a regular expression with a left and right value
 // left and right should be of type RE but this creates an endless loop 
 pub struct RE <T,J> {
-    pub left: T ,
+    pub left: T,
     pub right: J,
     pub re_type: ReType
 }
@@ -24,7 +40,7 @@ pub trait BasicMethods {
 // Implementation of the basic methods 
 impl <T, J> BasicMethods for RE<T, J> {
     fn of_type (&self) -> ReType{
-        //only did this because "self.ReType" would not work!
+        //only did this because "self.re_type" would not work!
         if matches!(self.re_type, ReType::Eps){
             ReType::Eps
         } else if matches!(self.re_type, ReType::Phi){
@@ -40,11 +56,12 @@ impl <T, J> BasicMethods for RE<T, J> {
         }
     }
     fn pretty (&self) -> String{
-        format!("Here the content of RE needs to be formated (and printed)!")
+        format!("Format the regular expression!")
     }
+    // might need an actual check for an empty String
     fn contains_eps (&self) -> bool{
         let mut contains_eps = false;
-        if matches!(self.of_type(), ReType::Eps) { // || matches!(self.of_type(), ReType::Phi) could be added for a contains_Phi() function 
+        if matches!(self.of_type(), ReType::Eps) { // || matches!(self.of_type(), ReType::Phi) could be added for a is_Phi() function 
             contains_eps = true;
         }
         contains_eps
@@ -81,5 +98,5 @@ pub fn run(){
            right: "os",
            re_type: ReType::Conc
        };
-       println!("Check if the RE is of type eps: {}",re1.contains_eps())
+       println!("{}",re1.of_type())
     }
