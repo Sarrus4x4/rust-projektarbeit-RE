@@ -6,13 +6,9 @@ and some basic functionality (evaluation)
 */
 
 
-
-
-
 pub struct Plus<T:Exp> {
     pub left: T,
     pub right: T
-
 }
 
 pub struct Int {
