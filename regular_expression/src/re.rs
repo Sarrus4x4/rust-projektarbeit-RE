@@ -1,3 +1,5 @@
+#[derive(Debug)]
+
 // ######### Structs #########
 pub struct Eps { //can it stay empty?
     //pub val: String
@@ -8,16 +10,16 @@ pub struct Phi { //can it stay empty?
 pub struct C {
     pub val: String
 }
-pub struct Alt { //TODO: i need to use generics as type instead of C so i can do nested function calls
-    pub left: C,
-    pub right: C
+pub struct Alt <T,J> {
+    pub l: T,
+    pub r: J
 }
-pub struct Conc { //TODO: i need to use generics as type instead of C so i can do nested function calls
-    pub left: C,
-    pub right: C
+pub struct Conc <T,J>{
+    pub l: T,
+    pub r: J
 }
-pub struct Star { //TODO: i need to use generics as type instead of C so i can do nested function calls
-    pub obj: C
+pub struct Star <T> {
+    pub obj: T
 }
 
 
@@ -39,19 +41,19 @@ impl Pretty for C {
         self.val.to_string()
     }
 }
-impl Pretty for Alt {
+impl <T:Pretty, J:Pretty> Pretty for Alt <T,J> {
     fn pretty(&self)->String{
-        format!("({}|{})",self.left.pretty(),self.right.pretty())
+        format!("({}|{})",self.l.pretty(),self.r.pretty()) //Add logic to check for eps/phi and format accordingly 
     }
 }
-impl Pretty for Conc{
+impl <T:Pretty, J:Pretty> Pretty for Conc <T,J>{
     fn pretty(&self)->String{
-        format!("({}{})",self.left.pretty(),self.right.pretty())
+        format!("({}{})",self.l.pretty(),self.r.pretty()) //Add logic to check for eps/phi and format accordingly 
     }
 }
-impl Pretty for Star{
+impl <T:Pretty> Pretty for Star <T>{
     fn pretty(&self)->String{
-        format!("({}*)",self.obj.pretty())
+        format!("({}*)",self.obj.pretty()) //Add logic to check for eps/phi and format accordingly 
     }
 }
 impl Pretty for Eps{ //do i even neet a pretty method for Eps? Yes i think so! :D
@@ -66,7 +68,7 @@ impl Pretty for Phi{ //do i even neet a pretty method for Phi? Yes i think so! :
 }
 
 // ######### Implementation ContainsEps #########
-impl ContainsEps for C { //do i only need to check for eps in C?
+impl ContainsEps for C  { //do i only need to check for eps in C?
     fn contains_eps(&self)->bool{
         let mut contains:bool = false;
         if self.pretty() == "" {
@@ -87,7 +89,7 @@ impl IsPhi for C {
         contains
     }
 }
-impl IsPhi for Alt { 
+impl<T:Pretty, U:Pretty> IsPhi for Alt<T,U> { 
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
         if self.pretty() == "" {
@@ -96,7 +98,7 @@ impl IsPhi for Alt {
         contains
     }
 }
-impl IsPhi for Conc { 
+impl <T:Pretty, U:Pretty> IsPhi for Conc<T,U> { 
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
         if self.pretty() == "" {
@@ -105,7 +107,7 @@ impl IsPhi for Conc {
         contains
     }
 }
-impl IsPhi for Star {
+impl <T:Pretty> IsPhi for Star<T> {
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
         if self.pretty() == "" {
@@ -114,16 +116,15 @@ impl IsPhi for Star {
         contains
     }
 }
-
 
 
 // ######### main method #########
 pub fn run(){
 
-    let re1 = Alt{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}};
+    let re1 = Alt{l: C{val: "a".to_string()}, r: C{val: "b".to_string()}};
     println!("{}",re1.pretty());
 
-    let re2 = Conc{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}};
+    let re2 = Conc{l: C{val: "a".to_string()}, r: C{val: "b".to_string()}};
     println!("{}",re2.pretty());
 
     let re3 = Star{obj: C{val: "a".to_string()}};
@@ -135,6 +136,7 @@ pub fn run(){
     let re5 = C{val: "".to_string()};
     println!("{}",re5.contains_eps());
 
-    //No nested function calls possible yet because of parameter of type 'C'
-    //Conc{Conc{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}}, Star{obj: C{val: "a".to_string()}}}; 
+    //This needs to be displayed correctly ->  (a*) b
+    let re6 = Conc{l: Eps{},r: Conc{l: Star{obj: Star{obj: C{val: "a".to_string()} }}, r: Alt{l: Phi{},r: C{val: "b".to_string()}}}}; 
+    println!("{}",re6.pretty());
 }
