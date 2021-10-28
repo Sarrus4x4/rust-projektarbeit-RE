@@ -8,15 +8,15 @@ pub struct Phi { //can it stay empty?
 pub struct C {
     pub val: String
 }
-pub struct Alt { //i need to use generics as type, not C
+pub struct Alt { //TODO: i need to use generics as type instead of C so i can do nested function calls
     pub left: C,
     pub right: C
 }
-pub struct Conc { //i need to use generics as type, not C 
+pub struct Conc { //TODO: i need to use generics as type instead of C so i can do nested function calls
     pub left: C,
     pub right: C
 }
-pub struct Star { //i need to use generics as type, not C 
+pub struct Star { //TODO: i need to use generics as type instead of C so i can do nested function calls
     pub obj: C
 }
 
@@ -135,8 +135,6 @@ pub fn run(){
     let re5 = C{val: "".to_string()};
     println!("{}",re5.contains_eps());
 
-
-    //Conc{Conc{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}}, Star{obj: C{val: "a".to_string()}}};
+    //No nested function calls possible yet because of parameter of type 'C'
+    //Conc{Conc{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}}, Star{obj: C{val: "a".to_string()}}}; 
 }
-
-
