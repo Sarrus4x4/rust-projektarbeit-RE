@@ -37,38 +37,113 @@ pub trait IsPhi { //check if the whole RE is Phi (not shure if i even need this)
 
 // ######### Implementation Pretty #########
 impl Pretty for C {
-    fn pretty(&self)->String{
+    fn pretty(&self)->String{ //Todo: Add logic to check for eps/phi and format accordingly 
         self.val.to_string()
     }
 }
-impl <T:Pretty, J:Pretty> Pretty for Alt <T,J> {
+impl <T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> Pretty for Alt <T,J> {
     fn pretty(&self)->String{
-        format!("({}|{})",self.l.pretty(),self.r.pretty()) //Add logic to check for eps/phi and format accordingly 
+        if self.l.contains_eps()||self.l.is_phi(){
+            if self.r.contains_eps() || self.r.is_phi() {
+                format!("")  
+            }else{
+                format!("{}",self.r.pretty())
+            }
+        }else if self.r.contains_eps() || self.r.is_phi(){
+            format!("{}",self.l.pretty())
+        }else{
+            format!("({}|{})",self.l.pretty(),self.r.pretty()) //logic to check for phi and format accordingly 
+        }
+        
     }
 }
-impl <T:Pretty, J:Pretty> Pretty for Conc <T,J>{
+impl <T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> Pretty for Conc <T,J>{
     fn pretty(&self)->String{
-        format!("({}{})",self.l.pretty(),self.r.pretty()) //Add logic to check for eps/phi and format accordingly 
+        if self.l.is_phi() || self.r.is_phi() { //if left or right argument of concat is Phi -> the whole term is Phi
+            format!("")
+        }else{
+            if self.l.contains_eps(){
+                if self.r.contains_eps(){
+                    format!("")  
+                }else{
+                    format!("{}",self.r.pretty())
+                }
+            }else if self.r.contains_eps(){
+                format!("{}",self.l.pretty())
+            }else{
+                format!("({}{})",self.l.pretty(),self.r.pretty()) //logic to check for phi and format accordingly 
+            }
+        }
     }
 }
-impl <T:Pretty> Pretty for Star <T>{
+
+impl <T:Pretty+ContainsEps+IsPhi> Pretty for Star <T>{
     fn pretty(&self)->String{
-        format!("({}*)",self.obj.pretty()) //Add logic to check for eps/phi and format accordingly 
+        if self.obj.contains_eps()||self.obj.is_phi(){ //logic to check for eps/phi and format accordingly 
+            format!("")
+        }else{
+            format!("({}*)",self.obj.pretty()) //Todo: Add logic to recognize nested star calls and format them accordingly 
+        }
     }
 }
-impl Pretty for Eps{ //do i even neet a pretty method for Eps? Yes i think so! :D
+impl Pretty for Eps{
     fn pretty(&self)->String{
         format!("")
     }
 }
-impl Pretty for Phi{ //do i even neet a pretty method for Phi? Yes i think so! :D
+impl Pretty for Phi{
     fn pretty(&self)->String{
-        format!("")
+        format!("phi")
     }
 }
 
 // ######### Implementation ContainsEps #########
-impl ContainsEps for C  { //do i only need to check for eps in C?
+impl ContainsEps for C  {
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl ContainsEps for Phi  {
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl ContainsEps for Eps  {
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl <T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> ContainsEps for Alt<T,J>  {
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl <T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> ContainsEps for Conc<T,J>  {
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl <T:Pretty+ContainsEps+IsPhi> ContainsEps for Star<T>  {
     fn contains_eps(&self)->bool{
         let mut contains:bool = false;
         if self.pretty() == "" {
@@ -79,38 +154,55 @@ impl ContainsEps for C  { //do i only need to check for eps in C?
 }
 
 // ######### Implementation IsPhi #########
-//do i even need those? It is the exact same implementation as 'ContainsEps' for every single one of them!
 impl IsPhi for C {
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
-        if self.pretty() == "" {
+        if self.pretty() == "phi" {
             contains = true;
         }
         contains
     }
 }
-impl<T:Pretty, U:Pretty> IsPhi for Alt<T,U> { 
+impl<T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> IsPhi for Alt<T,J> { 
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
-        if self.pretty() == "" {
+        if self.pretty() == "phi" {
             contains = true;
         }
         contains
     }
 }
-impl <T:Pretty, U:Pretty> IsPhi for Conc<T,U> { 
+impl <T:Pretty+ContainsEps+IsPhi, J:Pretty+ContainsEps+IsPhi> IsPhi for Conc<T,J> { 
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
-        if self.pretty() == "" {
+        if self.pretty() == "phi" {
             contains = true;
         }
         contains
     }
 }
-impl <T:Pretty> IsPhi for Star<T> {
+impl <T:Pretty+ContainsEps+IsPhi> IsPhi for Star<T> {
     fn is_phi(&self)->bool{
         let mut contains:bool = false;
-        if self.pretty() == "" {
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl IsPhi for Eps {
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl IsPhi for Phi {
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "phi" {
             contains = true;
         }
         contains
@@ -135,6 +227,10 @@ pub fn run(){
 
     let re5 = C{val: "".to_string()};
     println!("{}",re5.contains_eps());
+
+
+    let re7 = Conc{l: Star{obj: Star{obj: C{val: "a".to_string()} }}, r: Alt{l: Phi{},r: C{val: "b".to_string()}}}; 
+    println!("{}",re7.pretty());
 
     //This needs to be displayed correctly ->  (a*) b
     let re6 = Conc{l: Eps{},r: Conc{l: Star{obj: Star{obj: C{val: "a".to_string()} }}, r: Alt{l: Phi{},r: C{val: "b".to_string()}}}}; 
