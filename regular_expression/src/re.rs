@@ -1,7 +1,9 @@
 // ######### Structs #########
-pub struct Eps {
+pub struct Eps { //can it stay empty?
+    //pub val: String
 }
-pub struct Phi {
+pub struct Phi { //can it stay empty?
+    //pub val: String
 }
 pub struct C {
     pub val: String
@@ -23,19 +25,16 @@ pub struct Star { //i need to use generics as type, not C
 pub trait Pretty { //for printing out the result
     fn pretty (&self) -> String;
 }
-// pub trait Compute { //for evaluating the result 
-//     fn compute(&self)->String;
-// }
-pub trait ContainsEps { //check of it contains Eps
+pub trait ContainsEps { //check if the element contains Eps
     fn contains_eps (&self) -> bool;
 }
-pub trait IsPhi { //check of it is Phi
+pub trait IsPhi { //check if the whole RE is Phi (not shure if i even need this)
     fn is_phi (&self) -> bool;
 }
 
 
-// ######### Implementations #########
-impl Pretty for C { //pretty method only relevant for C
+// ######### Implementation Pretty #########
+impl Pretty for C {
     fn pretty(&self)->String{
         self.val.to_string()
     }
@@ -55,20 +54,70 @@ impl Pretty for Star{
         format!("({}*)",self.obj.pretty())
     }
 }
-impl Pretty for Eps{ //do i even neet a pretty method for Eps?
+impl Pretty for Eps{ //do i even neet a pretty method for Eps? Yes i think so! :D
     fn pretty(&self)->String{
         format!("")
     }
 }
-impl Pretty for Phi{ //do i even neet a pretty method for Eps?
+impl Pretty for Phi{ //do i even neet a pretty method for Phi? Yes i think so! :D
     fn pretty(&self)->String{
         format!("")
     }
 }
 
+// ######### Implementation ContainsEps #########
+impl ContainsEps for C { //do i only need to check for eps in C?
+    fn contains_eps(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+
+// ######### Implementation IsPhi #########
+//do i even need those? It is the exact same implementation as 'ContainsEps' for every single one of them!
+impl IsPhi for C {
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl IsPhi for Alt { 
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl IsPhi for Conc { 
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
+impl IsPhi for Star {
+    fn is_phi(&self)->bool{
+        let mut contains:bool = false;
+        if self.pretty() == "" {
+            contains = true;
+        }
+        contains
+    }
+}
 
 
 
+// ######### main method #########
 pub fn run(){
 
     let re1 = Alt{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}};
@@ -80,9 +129,14 @@ pub fn run(){
     let re3 = Star{obj: C{val: "a".to_string()}};
     println!("{}",re3.pretty());
 
+    let re4 = C{val: "a".to_string()};
+    println!("{}",re4.contains_eps());
 
-    //Conc(C: 'a', Conc(C: 'b', Star(C: 'd'))
-    //this is how i create a RE?
+    let re5 = C{val: "".to_string()};
+    println!("{}",re5.contains_eps());
+
+
+    //Conc{Conc{left: C{val: "a".to_string()}, right: C{val: "b".to_string()}}, Star{obj: C{val: "a".to_string()}}};
 }
 
 
