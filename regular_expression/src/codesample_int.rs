@@ -1,6 +1,3 @@
-
-
-
 pub trait Exp {
     fn eval(&self) -> i32;
 }
@@ -25,13 +22,5 @@ impl<T:Exp> Exp for Plus<T> {
     fn eval(&self) -> i32 {
       return self.left.eval() + self.right.eval()
     }
-
-}
-
-
-fn main() {
-    let e = Plus { left: Int{val:1}, right: Int{val:2}};
-
-    println!("{} done",e.eval());
 
 }

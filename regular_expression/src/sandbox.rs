@@ -90,13 +90,3 @@ impl <T, J> BasicMethods for RE<T, J> {
 // pub struct Star {
 //     pub val_to_star: RE
 // }
-
-
-pub fn run(){ 
-       let re1 = RE{
-           left: 's',
-           right: "os",
-           re_type: ReType::Conc
-       };
-       println!("{}",re1.of_type())
-    }
