@@ -25,18 +25,34 @@ pub struct Star<T> {
 }
 
 // ######### Traits #########
-pub trait Pretty {
+pub trait Pretty: {
     //for printing out the result
     fn pretty(&self) -> String;
 }
-pub trait ContainsEps {
+pub trait ContainsEps{ //:Pretty
     //check if the element contains Eps
     fn contains_eps(&self) -> bool;
+    // fn contains_eps(&self) -> bool {
+    //     let mut contains: bool = false;
+    //     if self.pretty() == "" {
+    //         contains = true;
+    //     }
+    //     contains
+    // }
 }
-pub trait IsPhi {
+pub trait IsPhi { //:Pretty
     //check if the whole RE is Phi (not shure if i even need this)
     fn is_phi(&self) -> bool;
+    // fn is_phi(&self) -> bool {
+    //     let mut contains: bool = false;
+    //     if self.pretty() == "phi" {
+    //         contains = true;
+    //     }
+    //     contains
+    // }
 }
+
+// This does not solve my problem (Do i have to use master traits in another way?)
 
 // ######### Implementation Pretty #########
 impl Pretty for C {
@@ -44,7 +60,7 @@ impl Pretty for C {
         self.val.to_string()
     }
 }
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty for Alt<T, J> { //TODO: Add logic r + r ==> r (Do I need a isEqual Function?)
+impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty for Alt<T, J> {
     fn pretty(&self) -> String {
         if self.l.contains_eps() || self.l.is_phi() {
             if self.r.contains_eps() || self.r.is_phi() {
@@ -55,7 +71,11 @@ impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty fo
         } else if self.r.contains_eps() || self.r.is_phi() {
             format!("{}", self.l.pretty())
         } else {
-            format!("({}|{})", self.l.pretty(), self.r.pretty()) //logic to check for phi and format accordingly
+            if self.l.pretty() == self.r.pretty(){
+                format!("{}", self.l.pretty()) 
+            }else{
+                format!("({}|{})", self.l.pretty(), self.r.pretty())
+            }
         }
     }
 }
@@ -86,7 +106,15 @@ impl<T: Pretty + ContainsEps + IsPhi> Pretty for Star<T> {
             //logic to check for eps/phi and format accordingly
             format!("")
         } else {
-            format!("({}*)", self.obj.pretty()) //TODO: Add logic for (r*)* ==> r* And also the logic for r* ==> eps falls L(r)={}
+            // let len = self.pretty().len();
+            // let last = self.pretty()[len-1..];
+            // if last == "*"{
+            //     format!("{}", self.obj.pretty())
+            // }else{
+            //     format!("({}*)", self.obj.pretty())
+            // }
+            format!("({}*)", self.obj.pretty())  // <------------------------------------------- TODO: Add logic for (r*)* ==> r*
+            
         }
     }
 }
@@ -101,11 +129,14 @@ impl Pretty for Phi {
     }
 }
 
-// ######### Implementation ContainsEps #########
+// ######### Implementation ContainsEps ######### 
+
+// I need to use master Traits so i dont have to impl it 6 times
+
 impl ContainsEps for C {
     fn contains_eps(&self) -> bool {
         let mut contains: bool = false;
-        if self.pretty() == "" {
+        if self.val == "" {
             contains = true;
         }
         contains
@@ -158,6 +189,9 @@ impl<T: Pretty + ContainsEps + IsPhi> ContainsEps for Star<T> {
 }
 
 // ######### Implementation IsPhi #########
+
+// I need to use master Traits so i dont have to impl it 6 times
+
 impl IsPhi for C {
     fn is_phi(&self) -> bool {
         let mut contains: bool = false;
@@ -215,88 +249,31 @@ impl IsPhi for Phi {
 
 // ######### main method #########
 pub fn run() {
-    let re1 = Alt {
-        l: C {
-            val: "a".to_string(),
-        },
-        r: C {
-            val: "b".to_string(),
-        },
-    };
+    let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
     println!("{}", re1.pretty());
 
-    let re2 = Conc {
-        l: C {
-            val: "a".to_string(),
-        },
-        r: C {
-            val: "b".to_string(),
-        },
-    };
+    let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
     println!("{}", re2.pretty());
 
-    let re3 = Star {
-        obj: C {
-            val: "a".to_string(),
-        },
-    };
+    let re3 = Star { obj: C {  val: "a".to_string()}};
     println!("{}", re3.pretty());
 
-    let re4 = C {
-        val: "a".to_string(),
-    };
+    let re4 = C {  val: "a".to_string()};
     println!("{}", re4.contains_eps());
 
-    let re5 = C {
-        val: "".to_string(),
-    };
+    let re5 = C {  val: "".to_string()};
     println!("{}", re5.contains_eps());
 
-    let re6 = C {
-        val: "a".to_string(),
-    };
+    let re6 = C {val: "a".to_string()};
     println!("{}", re6.is_phi());
 
-    let re7 = C {
-        val: "phi".to_string(),
-    };
+    let re7 = C { val: "phi".to_string()};
     println!("{}", re7.is_phi());
 
-    let re8 = Conc {
-        l: Star {
-            obj: Star {
-                obj: C {
-                    val: "a".to_string(),
-                },
-            },
-        },
-        r: Alt {
-            l: Phi {},
-            r: C {
-                val: "b".to_string(),
-            },
-        },
-    };
+    let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
     println!("{}", re8.pretty());
 
-    //This needs to be displayed correctly ->  (a*) b
-    let re9 = Conc {
-        l: Eps {},
-        r: Conc {
-            l: Star {
-                obj: Star {
-                    obj: C {
-                        val: "a".to_string(),
-                    },
-                },
-            },
-            r: Alt {
-                l: Phi {},
-                r: C {
-                    val: "b".to_string(),
-                },
-            },
-        },
-    };
+    //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
+    let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
     println!("{}", re9.pretty());
 }
