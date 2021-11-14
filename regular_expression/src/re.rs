@@ -248,32 +248,32 @@ impl IsPhi for Phi {
 }
 
 // ######### main method #########
-pub fn run() {
-    let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
-    println!("{}", re1.pretty());
+// pub fn run() {
+//     let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
+//     println!("{}", re1.pretty());
 
-    let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
-    println!("{}", re2.pretty());
+//     let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
+//     println!("{}", re2.pretty());
 
-    let re3 = Star { obj: C {  val: "a".to_string()}};
-    println!("{}", re3.pretty());
+//     let re3 = Star { obj: C {  val: "a".to_string()}};
+//     println!("{}", re3.pretty());
 
-    let re4 = C {  val: "a".to_string()};
-    println!("{}", re4.contains_eps());
+//     let re4 = C {  val: "a".to_string()};
+//     println!("{}", re4.contains_eps());
 
-    let re5 = C {  val: "".to_string()};
-    println!("{}", re5.contains_eps());
+//     let re5 = C {  val: "".to_string()};
+//     println!("{}", re5.contains_eps());
 
-    let re6 = C {val: "a".to_string()};
-    println!("{}", re6.is_phi());
+//     let re6 = C {val: "a".to_string()};
+//     println!("{}", re6.is_phi());
 
-    let re7 = C { val: "phi".to_string()};
-    println!("{}", re7.is_phi());
+//     let re7 = C { val: "phi".to_string()};
+//     println!("{}", re7.is_phi());
 
-    let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
-    println!("{}", re8.pretty());
+//     let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
+//     println!("{}", re8.pretty());
 
-    //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
-    let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
-    println!("{}", re9.pretty());
-}
+//     //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
+//     let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
+//     println!("{}", re9.pretty());
+// }

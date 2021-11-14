@@ -122,17 +122,19 @@ impl<T: RE, J: RE> RE for Conc<T, J> {
 }
 
 impl<T: RE> RE for Star<T> {
+    
     fn pretty(&self) -> String {
+        
         if self.obj.contains_eps() || self.obj.is_phi() {
             //logic to check for eps/phi and format accordingly
             format!("")
         } else {
             let s = self.obj.pretty();
-            let last: Vec<char> = s.chars().rev().take(1).collect(); // <--- only returns the actual chars like 'a' but not '*'  | I can not use .length during runtime!
-            println!("{:?}", last);
-          
-
-            format!("({}*)", self.obj.pretty())  // <------------------------------------------- TODO: Add logic for (r*)* ==> r*
+            if s.ends_with("*)"){ // logic for (r*)* ==> r*
+                format!("{}", self.obj.pretty())
+            } else{
+                format!("({}*)", self.obj.pretty())  
+            }
             
         }
     }
@@ -194,31 +196,34 @@ impl RE for Phi {
 
 // ######### main method #########
 pub fn run() {
-    // let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
-    // println!("{}", re1.pretty());
+    let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
+    println!("{}", re1.pretty());
 
-    // let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
-    // println!("{}", re2.pretty());
+    let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
+    println!("{}", re2.pretty());
 
-    let re3 = Star { obj: C {  val: "a".to_string()}};
+    let re3 = Star { obj: Star { obj: C {  val: "a".to_string()}}};
     println!("{}", re3.pretty());
 
-    // let re4 = C {  val: "a".to_string()};
-    // println!("{}", re4.contains_eps());
+    let re4 = C {  val: "a".to_string()};
+    println!("{}", re4.contains_eps());
 
-    // let re5 = C {  val: "".to_string()};
-    // println!("{}", re5.contains_eps());
+    let re5 = C {  val: "".to_string()};
+    println!("{}", re5.contains_eps());
 
-    // let re6 = C {val: "a".to_string()};
-    // println!("{}", re6.is_phi());
+    let re6 = C {val: "a".to_string()};
+    println!("{}", re6.is_phi());
 
-    // let re7 = C { val: "phi".to_string()};
-    // println!("{}", re7.is_phi());
+    let re7 = C { val: "phi".to_string()};
+    println!("{}", re7.is_phi());
 
-    // let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
-    // println!("{}", re8.pretty());
+    let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
+    println!("{}", re8.pretty());
 
-    // //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
-    // let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
-    // println!("{}", re9.pretty());
+    //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
+    let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
+    println!("{}", re9.pretty());
+
+    let re10 = Star {obj: Conc{l: C { val: "a".to_string() } ,r: Star { obj: Star { obj: C {  val: "a".to_string()}}}}};
+    println!("{}", re10.pretty());
 }
