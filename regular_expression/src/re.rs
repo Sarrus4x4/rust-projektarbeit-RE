@@ -1,5 +1,3 @@
-#[derive(Debug)]
-
 // ######### Structs #########
 pub struct Eps {
     //can it stay empty?
@@ -25,42 +23,36 @@ pub struct Star<T> {
 }
 
 // ######### Traits #########
-pub trait Pretty: {
-    //for printing out the result
+
+pub trait RE {
     fn pretty(&self) -> String;
-}
-pub trait ContainsEps{ //:Pretty
-    //check if the element contains Eps
     fn contains_eps(&self) -> bool;
-    // fn contains_eps(&self) -> bool {
-    //     let mut contains: bool = false;
-    //     if self.pretty() == "" {
-    //         contains = true;
-    //     }
-    //     contains
-    // }
-}
-pub trait IsPhi { //:Pretty
-    //check if the whole RE is Phi (not shure if i even need this)
     fn is_phi(&self) -> bool;
-    // fn is_phi(&self) -> bool {
-    //     let mut contains: bool = false;
-    //     if self.pretty() == "phi" {
-    //         contains = true;
-    //     }
-    //     contains
-    // }
 }
 
-// This does not solve my problem (Do i have to use master traits in another way?)
+// ######### Implementation #########
 
-// ######### Implementation Pretty #########
-impl Pretty for C {
+impl RE for C {
     fn pretty(&self) -> String {
         self.val.to_string()
     }
+    fn contains_eps(&self) -> bool {
+        let mut contains: bool = false;
+        if self.val == "" {
+            contains = true;
+        }
+        contains
+    }
+    fn is_phi(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
 }
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty for Alt<T, J> {
+
+impl<T: RE, J: RE> RE for Alt<T, J> {
     fn pretty(&self) -> String {
         if self.l.contains_eps() || self.l.is_phi() {
             if self.r.contains_eps() || self.r.is_phi() {
@@ -78,8 +70,23 @@ impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty fo
             }
         }
     }
+    fn contains_eps(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "" { //.val
+            contains = true;
+        }
+        contains
+    }
+    fn is_phi(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
 }
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty for Conc<T, J> {
+
+impl<T: RE, J: RE> RE for Conc<T, J> {
     fn pretty(&self) -> String {
         if self.l.is_phi() || self.r.is_phi() {
             //if left or right argument of concat is Phi -> the whole term is Phi
@@ -98,146 +105,86 @@ impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> Pretty fo
             }
         }
     }
+    fn contains_eps(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "" { //.val
+            contains = true;
+        }
+        contains
+    }
+    fn is_phi(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
 }
 
-impl<T: Pretty + ContainsEps + IsPhi> Pretty for Star<T> {
+impl<T: RE> RE for Star<T> {
+    
     fn pretty(&self) -> String {
+        
         if self.obj.contains_eps() || self.obj.is_phi() {
             //logic to check for eps/phi and format accordingly
             format!("")
         } else {
-            // let len = self.pretty().len();
-            // let last = self.pretty()[len-1..];
-            // if last == "*"{
-            //     format!("{}", self.obj.pretty())
-            // }else{
-            //     format!("({}*)", self.obj.pretty())
-            // }
-            format!("({}*)", self.obj.pretty())  // <------------------------------------------- TODO: Add logic for (r*)* ==> r*
+            let s = self.obj.pretty();
+            if s.ends_with("*)"){ // logic for (r*)* ==> r*
+                format!("{}", self.obj.pretty())
+            } else{
+                format!("({}*)", self.obj.pretty())  
+            }
             
         }
     }
+    fn contains_eps(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "" { //.val
+            contains = true;
+        }
+        contains
+    }
+    fn is_phi(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
 }
-impl Pretty for Eps {
+
+impl RE for Eps {
     fn pretty(&self) -> String {
         format!("")
     }
+    fn contains_eps(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "" { //val
+            contains = true;
+        }
+        contains
+    }
+    fn is_phi(&self) -> bool {
+        let mut contains: bool = false;
+        if self.pretty() == "phi" {
+            contains = true;
+        }
+        contains
+    }
 }
-impl Pretty for Phi {
+
+impl RE for Phi {
     fn pretty(&self) -> String {
         format!("phi")
     }
-}
-
-// ######### Implementation ContainsEps ######### 
-
-// I need to use master Traits so i dont have to impl it 6 times
-
-impl ContainsEps for C {
     fn contains_eps(&self) -> bool {
         let mut contains: bool = false;
-        if self.val == "" {
+        if self.pretty() == "" { //.val
             contains = true;
         }
         contains
     }
-}
-impl ContainsEps for Phi {
-    fn contains_eps(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl ContainsEps for Eps {
-    fn contains_eps(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> ContainsEps for Alt<T, J> {
-    fn contains_eps(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> ContainsEps for Conc<T, J> {
-    fn contains_eps(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi> ContainsEps for Star<T> {
-    fn contains_eps(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "" {
-            contains = true;
-        }
-        contains
-    }
-}
-
-// ######### Implementation IsPhi #########
-
-// I need to use master Traits so i dont have to impl it 6 times
-
-impl IsPhi for C {
-    fn is_phi(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "phi" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> IsPhi for Alt<T, J> {
-    fn is_phi(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "phi" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi, J: Pretty + ContainsEps + IsPhi> IsPhi for Conc<T, J> {
-    fn is_phi(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "phi" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl<T: Pretty + ContainsEps + IsPhi> IsPhi for Star<T> {
-    fn is_phi(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "phi" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl IsPhi for Eps {
-    fn is_phi(&self) -> bool {
-        let mut contains: bool = false;
-        if self.pretty() == "phi" {
-            contains = true;
-        }
-        contains
-    }
-}
-impl IsPhi for Phi {
     fn is_phi(&self) -> bool {
         let mut contains: bool = false;
         if self.pretty() == "phi" {
@@ -248,32 +195,41 @@ impl IsPhi for Phi {
 }
 
 // ######### main method #########
-// pub fn run() {
-//     let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
-//     println!("{}", re1.pretty());
+pub fn run() {
+    let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
+    println!("{}", re1.pretty());
 
-//     let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
-//     println!("{}", re2.pretty());
+    let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
+    println!("{}", re2.pretty());
 
-//     let re3 = Star { obj: C {  val: "a".to_string()}};
-//     println!("{}", re3.pretty());
+    let re3 = Star { obj: Star { obj: C {  val: "a".to_string()}}};
+    println!("{}", re3.pretty());
 
-//     let re4 = C {  val: "a".to_string()};
-//     println!("{}", re4.contains_eps());
+    let re4 = C {  val: "a".to_string()};
+    println!("{}", re4.contains_eps());
 
-//     let re5 = C {  val: "".to_string()};
-//     println!("{}", re5.contains_eps());
+    let re5 = C {  val: "".to_string()};
+    println!("{}", re5.contains_eps());
 
-//     let re6 = C {val: "a".to_string()};
-//     println!("{}", re6.is_phi());
+    let re6 = C {val: "a".to_string()};
+    println!("{}", re6.is_phi());
 
-//     let re7 = C { val: "phi".to_string()};
-//     println!("{}", re7.is_phi());
+    let re7 = C { val: "phi".to_string()};
+    println!("{}", re7.is_phi());
 
-//     let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
-//     println!("{}", re8.pretty());
+    let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
+    println!("{}", re8.pretty());
 
-//     //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
-//     let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
-//     println!("{}", re9.pretty());
-// }
+    //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
+    let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
+    println!("{}", re9.pretty());
+
+    let re10 = Star {obj: Conc{l: C { val: "a".to_string() } ,r: Star { obj: Star { obj: C {  val: "a".to_string()}}}}};
+    println!("{}", re10.pretty());
+
+    let re11 = Phi{};
+    println!("{}", re11.pretty());
+
+    let re12 = Eps{};
+    println!("{}", re12.pretty());
+}
