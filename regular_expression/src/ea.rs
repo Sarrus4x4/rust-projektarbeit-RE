@@ -167,12 +167,6 @@ impl TransformWorkerRules for TransformWorker{
     }
 }
 
-pub fn  run <T:RE> (){
-    /*
-    let a = TransformWorker{name_supply: 0};
-    let b: &T;
-    b = T::{};
-
-    a.transform_worker(b: &T );
-    */
+pub fn  run (){
+    
 }
