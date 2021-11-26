@@ -4,6 +4,6 @@ mod codesample_int;
 
 
 pub fn main(){
-    //re::run();
-    ea::run();
+    re::run();
+    //ea::run();
 }
