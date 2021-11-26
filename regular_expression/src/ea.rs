@@ -117,13 +117,13 @@ impl TransformWorkerRules for TransformWorker{
         let mut start: i32 = 0;
         let mut stop: i32 = 0;
 
-        println!("This is a test: {:?}",re); 
+        println!("This is a test: {:?}",re);
         //I need to get information about the type of re
         // re.type_of() <--- Something like this 
         //later i will need to use the arguments of the different types of re (Example: Alt.l and Alt.r )
 
 
-        match re {        
+        match re { //Here the type of re will be matched to the 6 cases below 
             /*
             Eps => {
                     start = self.fresh();
