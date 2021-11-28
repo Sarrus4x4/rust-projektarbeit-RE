@@ -3,9 +3,6 @@ use crate::re::RE;
 //use std::any::type_name;
 use std::fmt::Debug;
 
-//extern crate re;
-use crate::re::Eps;
-
 
 // ######### Structs #########
 pub struct Transition{
@@ -116,15 +113,17 @@ impl TransformWorkerRules for TransformWorker{
     }
     fn transform<T:RE+Debug+NFARules>(self, re: &T )->NFA{
         self.init();
-        self.transform_worker_eps(re) // <--- i need to know the type of re to call the right transform_worker function!
+        self.transform_worker_eps(re)// <--- i need to know the type of re to call the right transform_worker function!
+        //Now i have the same problem in transform that i had in transform_worker before... I need a match (switch case) for all types of re
     }
     
     //I need to know the "type" of the parameter i am getting so i can call the next function!
     //If i Start with a Conc of two Chars i need to know that the two agruments of Conc are of "type" Char, so i can call transform_worker_c
+    //Maybe i need to add a Type_of function to the RE trait, so i can call it on T
 
-    fn transform_worker_eps<T:>(self, re: &T )->NFA{
+    fn transform_worker_eps<T:RE+Debug+NFARules>(self, re: &T )->NFA{
         // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
+        let mut transitions: Vec<Transition> = vec![];
         let mut start: i32 = 0;
         let mut stop: i32 = 0;
 
@@ -134,61 +133,39 @@ impl TransformWorkerRules for TransformWorker{
         temp_nfa_eps.create_nfa_one_final(transitions, start, stop);
         temp_nfa_eps
     }
-    fn transform_worker_phi<T:RE+Debug>(self, re: &T )->NFA{
+    fn transform_worker_phi<T:RE+Debug+NFARules>(self, re: &T )->NFA{
         // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
+        let mut transitions: Vec<Transition> = vec![];
         let mut start: i32 = 0;
         let mut stop: i32 = 0;
 
         start = self.fresh();
         stop = self.fresh();
-        let temp_nfa_phi =  NFA{initial_state: 0, final_state: vec![], transitions: vec![]} ;
-        temp_nfa_phi.create_nfa_one_final(transitions, start, stop);
-        temp_nfa_phi
+        let temp_nfa_eps =  NFA{initial_state: 0, final_state: vec![], transitions: vec![]};
+        temp_nfa_eps.create_nfa_one_final(transitions, start, stop);
+        temp_nfa_eps
     }
-    fn transform_worker_char<T:RE+Debug>(self, re: &T )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-        start = self.fresh();
-        stop = self.fresh();
-
-    
+    fn transform_worker_char<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+        //what i need 
+        //NFA n1 = transformWorker(r2->getLeft());
+        //NFA n2 = transformWorker(r2->getRight());
+        
+        //re.l is not possible... i need specific Types like Eps, Phi, ...
     }
-    fn transform_worker_alt<T:RE+Debug>(self, re: &T )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-
-        // let n1 = transformWorker(r2.getLeft());
-        // let n2 = transformWorker(r2.getRight());
+    fn transform_worker_alt<T:RE+Debug+NFARules>(self, re: &T )->NFA{
 
     }
-    fn transform_worker_conc<T:RE+Debug>(self, re: &T )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
+    fn transform_worker_conc<T:RE+Debug+NFARules>(self, re: &T )->NFA{
 
-       
     }
-    fn transform_worker_star<T:RE+Debug>(self, re: &T )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![]; 
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
+    fn transform_worker_star<T:RE+Debug+NFARules>(self, re: &T )->NFA{
 
-      
     }
 }
 
+
 // transformworker als überladene Methode mit den Instantzen eps, phi,... 
 // Die jeweiligen Methoden die zu einem Trait gehören können fuer bestimmte Typen implementiert werden.
-
 pub fn  run (){
     
 }

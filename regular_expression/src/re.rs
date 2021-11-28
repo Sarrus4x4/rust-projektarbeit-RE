@@ -31,6 +31,7 @@ pub trait RE {
     fn pretty(&self) -> String;
     fn contains_eps(&self) -> bool;
     fn is_phi(&self) -> bool;
+    //fn of_type(&self) -> String;  //<--- i need type comparison for this which i dont know how to perfom
 }
 
 // ######### Implementation #########
