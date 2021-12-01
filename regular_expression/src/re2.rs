@@ -2,26 +2,33 @@
 // This is where the different struct are defined 
 pub struct Eps {
     //The Eps object has no parameters 
+    pub name_supply: i32 //<--- this is for ea4 
+
 }
 pub struct Phi {
     //The Phi object has no parameters
+    pub name_supply: i32 //<--- this is for ea4 
 }
 pub struct C {
     pub val: String,
+    pub name_supply: i32 //<--- this is for ea4 
     //The C struct has a value parameter of type String. Here the the smalest element of a RE is saved
 }
 pub struct Alt<T, J> {
     pub l: T,
     pub r: J,
+    pub name_supply: i32 //<--- this is for ea4 
     //The Alt struct has tho parameters of a variable Type. They are the left and right part of the alternative clause (l|r)
 }
 pub struct Conc<T, J> {
     pub l: T,
     pub r: J,
+    pub name_supply: i32 //<--- this is for ea4 
     //The Conc struct has tho parameters of a variable Type. They are the left and right part of the concatination clause (lr)
 }
 pub struct Star<T> {
     pub obj: T,
+    pub name_supply: i32 //<--- this is for ea4 
     //The Star struct has a single parameter of variable Type. It is the argument which is supposed to get a "*" added to it like so: obj*
 }
 
@@ -213,40 +220,40 @@ impl RE for Phi {
 // ######### main method #########
 //Here i am testing different RE's for their correct formatting and simplification
 pub fn run() {
-    let re1 = Alt {l: C {val: "a".to_string() }, r: C { val: "b".to_string() }};
+    let re1 = Alt {l: C {val: "a".to_string(), name_supply: 0 }, r: C { val: "b".to_string() , name_supply: 0}, name_supply: 0};
     println!("{}", re1.pretty());
 
-    let re2 = Conc { l: C {  val: "a".to_string()},  r: C {val: "b".to_string()}};
+    let re2 = Conc { l: C {  val: "a".to_string(), name_supply: 0},  r: C {val: "b".to_string(), name_supply: 0}, name_supply: 0};
     println!("{}", re2.pretty());
 
-    let re3 = Star { obj: Star { obj: C {  val: "a".to_string()}}};
+    let re3 = Star { obj: Star { obj: C {  val: "a".to_string(), name_supply: 0}, name_supply: 0}, name_supply: 0};
     println!("{}", re3.pretty());
 
-    let re4 = C {  val: "a".to_string()};
+    let re4 = C {  val: "a".to_string(), name_supply: 0};
     println!("{}", re4.contains_eps());
 
-    let re5 = C {  val: "".to_string()};
+    let re5 = C {  val: "".to_string(), name_supply: 0};
     println!("{}", re5.contains_eps());
 
-    let re6 = C {val: "a".to_string()};
+    let re6 = C {val: "a".to_string(), name_supply: 0};
     println!("{}", re6.is_phi());
 
-    let re7 = C { val: "phi".to_string()};
+    let re7 = C { val: "phi".to_string(), name_supply: 0};
     println!("{}", re7.is_phi());
 
-    let re8 = Alt {l: Phi {}, r: C { val: "b".to_string()}};
+    let re8 = Alt {l: Phi { name_supply: 0}, r: C { val: "b".to_string(), name_supply: 0}, name_supply: 0};
     println!("{}", re8.pretty());
 
     //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
-    let re9 = Conc {l: Eps {},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string() } }}, r: Alt {l: Phi {}, r: C {val: "b".to_string() }}}};
+    let re9 = Conc {l: Eps {name_supply: 0},r: Conc {l: Star { obj: Star { obj: C { val: "a".to_string(), name_supply: 0 }, name_supply: 0 }, name_supply: 0}, r: Alt {l: Phi {name_supply: 0}, r: C {val: "b".to_string(), name_supply: 0 }, name_supply: 0}, name_supply: 0}, name_supply: 0};
     println!("{}", re9.pretty());
 
-    let re10 = Star {obj: Conc{l: C { val: "a".to_string() } ,r: Star { obj: Star { obj: C {  val: "a".to_string()}}}}};
+    let re10 = Star {obj: Conc{l: C { val: "a".to_string(), name_supply: 0 } ,r: Star { obj: Star { obj: C {  val: "a".to_string(), name_supply: 0}, name_supply: 0}, name_supply: 0}, name_supply: 0}, name_supply: 0};
     println!("{}", re10.pretty());
 
-    let re11 = Phi{};
+    let re11 = Phi{name_supply: 0};
     println!("{}", re11.pretty());
 
-    let re12 = Eps{};
+    let re12 = Eps{name_supply: 0};
     println!("{}", re12.pretty());
 }
