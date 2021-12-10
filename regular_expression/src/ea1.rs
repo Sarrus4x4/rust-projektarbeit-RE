@@ -3,6 +3,17 @@ use crate::re1::RE;
 //use std::any::type_name;
 use std::fmt::Debug;
 
+use crate::re2::Eps;
+use crate::re2::Phi;
+use crate::re2::C;
+use crate::re2::Alt;
+use crate::re2::Conc;
+use crate::re2::Star;
+use std::any::type_name;
+fn type_of<T>(_: T) -> &'static str {
+    type_name::<T>()
+}
+
 
 // ######### Structs #########
 pub struct Transition{
@@ -44,11 +55,11 @@ pub trait TransformWorkerRules{
     fn fresh(self)->i32;
     fn transform<T: RE+Debug+NFARules>(self, re: &T )->NFA;
     fn transform_worker_eps<T:RE+Debug+NFARules>(self, re: &T )->NFA;
-    fn transform_worker_phi<T:RE+Debug+NFARules>(self, re: &T )->NFA;
-    fn transform_worker_char<T:RE+Debug+NFARules>(self, re: &T )->NFA;
-    fn transform_worker_alt<T:RE+Debug+NFARules>(self, re: &T )->NFA;
-    fn transform_worker_conc<T:RE+Debug+NFARules>(self, re: &T )->NFA;
-    fn transform_worker_star<T:RE+Debug+NFARules>(self, re: &T )->NFA;
+    //fn transform_worker_phi<T:RE+Debug+NFARules>(self, re: &T )->NFA;
+    //fn transform_worker_char<T:RE+Debug+NFARules>(self, re: &T )->NFA;
+    fn transform_worker_alt<T:RE+Debug+NFARules>(self, re: &T );
+    //fn transform_worker_conc<T:RE+Debug+NFARules>(self, re: &T )->NFA;
+    //fn transform_worker_star<T:RE+Debug+NFARules>(self, re: &T )->NFA;
 }
 
 // ######### Implementation #########
@@ -133,34 +144,82 @@ impl TransformWorkerRules for TransformWorker{
         temp_nfa_eps.create_nfa_one_final(transitions, start, stop);
         temp_nfa_eps
     }
-    fn transform_worker_phi<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+    fn transform_worker_alt<T:RE+Debug+NFARules>(self, re: &T ){
         // TODO
+
         let mut transitions: Vec<Transition> = vec![];
         let mut start: i32 = 0;
         let mut stop: i32 = 0;
 
+        //this is what i need 
+        // NFA n1 = transformWorker(r2->getLeft());
+        // NFA n2 = transformWorker(r2->getRight());
+
+        //this is what i have
+        // i need to know the type of re.l and re.r so i can call the right transformworker function
+        let n1;
+        let n2;
+
+        //i know that this match does not work like that... i can use type_of() later to fix it
+        match re.l{
+            Eps => {
+                n1 = self.transform_worker_eps(re.l); //<--- So hardcoding the parameter of transformworker into a set Type is not the right way?
+            }
+            Phi => {
+                n1 = self.transform_worker_phi(re.l);
+            }
+            C => {
+                n1 = self.transform_worker_char(re.l);
+            }
+            Alt => {
+                type_of(re.l);
+                n1 = self.transform_worker_alt(re.l);
+            }
+            Conc => {
+                n1 = self.transform_worker_conc(re.l);
+            }
+            Star => {
+                n1 = self.transform_worker_star(re.l);
+            }
+        }
+        match re.r{
+            Eps => {
+                n2 = self.transform_worker_eps(re.r);
+            }
+            Phi => {
+                n2 = self.transform_worker_phi(re.r);
+            }
+            C => {
+                n2 = self.transform_worker_char(re.r);
+            }
+            Alt => {
+                n2 = self.transform_worker_alt(re.r);
+            }
+            Conc => {
+                n2 = self.transform_worker_conc(re.r);
+            }
+            Star => {
+                n2 = self.transform_worker_star(re.r);
+            }
+        }
+
         start = self.fresh();
         stop = self.fresh();
-        let temp_nfa_eps =  NFA{initial_state: 0, final_state: vec![], transitions: vec![]};
-        temp_nfa_eps.create_nfa_one_final(transitions, start, stop);
-        temp_nfa_eps
-    }
-    fn transform_worker_char<T:RE+Debug+NFARules>(self, re: &T )->NFA{
-        //what i need 
-        //NFA n1 = transformWorker(r2->getLeft());
-        //NFA n2 = transformWorker(r2->getRight());
-        
-        //re.l is not possible... i need specific Types like Eps, Phi, ...
-    }
-    fn transform_worker_alt<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+        let n1_start: i32 = n1.get_initial();
+        let n1_stop: i32 = n1.get_finals()[0];
+        let n2_start: i32 = n2.get_initial();
+        let n2_stop: i32 = n2.get_finals()[0];
 
-    }
-    fn transform_worker_conc<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+        let t1: Vec<Transition> = n1.get_transitions();
+        let t2: Vec<Transition> = n2.get_transitions();
 
-    }
-    fn transform_worker_star<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+        transitions.insert(transitions.end(),t1.begin(),t1.end()); //<--- why are there 3 arguments? How does insert work in C++?
 
+
+
+        println!(""); //<-- to stop the return error
     }
+
 }
 
 

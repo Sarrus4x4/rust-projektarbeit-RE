@@ -51,7 +51,7 @@ pub trait NFARules {
     fn get_initial(self)->i32;
     fn get_finals(self)->Vec<i32>;
 }
-pub trait TransformWorkerRulesAlt{
+pub trait TransformWorkerRules{
     // Kein Plan
     fn init(self);
     fn fresh(self)->i32;
@@ -115,7 +115,7 @@ impl NFARules for NFA {
 }
 
 //Implementing the TransformWorkerRulesAlt for the Alt type
-impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
+impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRules for Alt<T,J>{
 
     fn init(mut self){
         self.name_supply = 0;
@@ -138,23 +138,23 @@ impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
         // NFA n2 = transformWorker(r2->getRight());
         
         //this is what i have
-        // i need to know the type of re.l and re.r so i can call the right transformworker function
+        //i need to know the type of re.l and re.r so i can call the right transformworker function -> this is why i need to use the Alt<S,I> parameter instead of a generic one
         let n1;
         let n2;
 
         match type_of(re.l){
-            "regular_expression::re::C" => {
+            "regular_expression::re::Alt" => {
                 type_of(re.l);
-                n1 = self.transform_worker_alt(re.l);
+                n1 = self.transform_worker_alt(re.l); //<- this is my problem: expected struct `re2::Alt`, found type parameter `S` (but if i use re as a generic parameter i can't use re.l and re.r)
             }
         }
-        match re.r{
-            Alt => {
-                n2 = self.transform_worker_alt(re.r);
+        match type_of(re.r){
+            "regular_expression::re::Alt" => {
+                n2 = self.transform_worker_alt(re.r); //<- this is my problem: expected struct `re2::Alt`, found type parameter `I` (but if i use re as a generic parameter i can't use re.l and re.r)
             }
         }
         
-        start = self.fresh();
+        /*start = self.fresh();
         stop = self.fresh();
         let n1_start: i32 = n1.get_initial();
         let n1_stop: i32 = n1.get_finals()[0];
@@ -164,7 +164,8 @@ impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
         let t1: Vec<Transition> = n1.get_transitions();
         let t2: Vec<Transition> = n2.get_transitions();
 
-        transitions.insert(transitions.end(),t1.begin(),t1.end()); //<--- why are there 3 arguments? How does insert work in C++?
+        transitions.insert(transitions.end(),t1.begin(),t1.end());
+        */ //<--- why are there 3 arguments? How does insert work in C++?
    
     }
     
