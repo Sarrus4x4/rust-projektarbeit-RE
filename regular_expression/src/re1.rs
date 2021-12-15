@@ -244,10 +244,4 @@ pub fn run() {
 
     let re10 = Star {obj: Conc{l: C { val: "a".to_string() } ,r: Star { obj: Star { obj: C {  val: "a".to_string()}}}}};
     println!("{}", re10.pretty());
-
-    let re11 = Phi{};
-    println!("{}", re11.pretty());
-
-    let re12 = Eps{};
-    println!("{}", re12.pretty());
 }
