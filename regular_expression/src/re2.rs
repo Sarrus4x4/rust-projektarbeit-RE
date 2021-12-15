@@ -2,33 +2,33 @@
 // This is where the different struct are defined 
 pub struct Eps {
     //The Eps object has no parameters 
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
 
 }
 pub struct Phi {
     //The Phi object has no parameters
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
 }
 pub struct C {
     pub val: String,
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
     //The C struct has a value parameter of type String. Here the the smalest element of a RE is saved
 }
 pub struct Alt<T, J> {
     pub l: T,
     pub r: J,
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
     //The Alt struct has tho parameters of a variable Type. They are the left and right part of the alternative clause (l|r)
 }
 pub struct Conc<T, J> {
     pub l: T,
     pub r: J,
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
     //The Conc struct has tho parameters of a variable Type. They are the left and right part of the concatination clause (lr)
 }
 pub struct Star<T> {
     pub obj: T,
-    pub name_supply: i32 //<--- this is for ea4 
+    pub name_supply: i32 //<--- this is for ea
     //The Star struct has a single parameter of variable Type. It is the argument which is supposed to get a "*" added to it like so: obj*
 }
 

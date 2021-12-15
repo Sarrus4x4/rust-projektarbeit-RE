@@ -10,6 +10,7 @@ use crate::re2::C;
 use crate::re2::Alt;
 use crate::re2::Conc;
 use crate::re2::Star;
+
 use std::any::type_name;
 
 fn type_of<T>(_: T) -> &'static str {
@@ -54,15 +55,11 @@ pub trait TransformWorkerRules{
     // Kein Plan
     fn init(self);
     fn fresh(self)->i32;
-    fn transform<T: RE+Debug+NFARules>(self, re: &T )->NFA;
-
-    fn transform_worker_eps(self, re: Eps )->NFA;
-    fn transform_worker_phi(self, re: Phi )->NFA;
-    fn transform_worker_char(self, re: C )->NFA;
-    fn transform_worker_alt<T:RE, J:RE>(self, re: Alt<T,J> )->NFA;
-    fn transform_worker_conc<T:RE, J:RE>(self, re: Conc<T,J> )->NFA;
-    fn transform_worker_star<T:RE>(self, re: Star<T> )->NFA;
+    fn transform<T: RE, J: RE>(self, re: Alt<T,J> );
+    fn transform_worker<T: RE>(self, re: T );
 }
+
+
 
 // ######### Implementation #########
 
@@ -116,7 +113,13 @@ impl NFARules for NFA {
     }
 }
 
-impl TransformWorkerRules for TransformWorker{
+
+
+//In this file i try to implement the TransformWorkerRules for every type (phi, eps,...) seperatly but with the same Trait -> TransformWorkerRules for Type Alt<T,J>
+//I am calling the transformWorker function with the parameter re of a generic Type T: RE
+
+//Implementing the TransformWorkerRules for the Alt type
+impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRules for Alt<T,J>{
 
     fn init(mut self){
         self.name_supply = 0;
@@ -124,51 +127,11 @@ impl TransformWorkerRules for TransformWorker{
     fn fresh(self)->i32 {
         self.name_supply+1
     }
-    fn transform<T:RE+Debug+NFARules>(self, re: &T )->NFA{
+    fn transform<S:RE, I:RE >(self, re: Alt<S,I> ){
         self.init();
-        match type_of(re){
-            "regular_expression::re::C" => { self.transform_worker_char(re);}
-        }
-        self.transform_worker_eps(re) // <--- i need to know the type of re to call the right transform_worker function!
-        //Now i have the same problem in transform that i had in transform_worker before... I need a match (switch case) for all types of re
+        self.transform_worker(re)
     }
-
-    //I need to know the "type" of the parameter i am getting so i can call the next function!
-    //If i Start with a Conc of two Chars i need to know that the two agruments of Conc are of "type" Char, so i can call transform_worker_c
-    //Maybe i need to add a Type_of function to the RE trait, so i can call it on Eps, Phi, ...
-
-    fn transform_worker_eps(self, re: Eps )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![];
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-        start = self.fresh();
-        stop = self.fresh();
-        let temp_nfa_eps =  NFA{initial_state: 0, final_state: vec![], transitions: vec![]};
-        temp_nfa_eps.create_nfa_one_final(transitions, start, stop);
-        temp_nfa_eps
-    }
-    fn transform_worker_phi(self, re: Phi )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![];
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-        start = self.fresh();
-        stop = self.fresh();
-        let temp_nfa_phi =  NFA{initial_state: 0, final_state: vec![], transitions: vec![]} ;
-        temp_nfa_phi.create_nfa_one_final(transitions, start, stop);
-        temp_nfa_phi
-    }
-    fn transform_worker_char(self, re: C )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![];
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-    }
-    fn transform_worker_alt<T:RE, J:RE>(self, re: Alt<T,J> )->NFA{
+    fn transform_worker<S:RE>(self, re: S){
         // TODO
         let mut transitions: Vec<Transition> = vec![];
         let mut start: i32 = 0;
@@ -183,86 +146,36 @@ impl TransformWorkerRules for TransformWorker{
         let n1;
         let n2;
 
-        //i know that this match does not work like that... i can use type_of() later to fix it
-        match re.l{
-            Eps => {
-                n1 = self.transform_worker_eps(re.l); //<--- So hardcoding the parameter of transformworker into a set Type is not the right way?
-            }
-            Phi => {
-                n1 = self.transform_worker_phi(re.l);
-            }
-            C => {
-                n1 = self.transform_worker_char(re.l);
-            }
-            Alt => {
-                type_of(re.l);
-                n1 = self.transform_worker_alt(re.l);
-            }
-            Conc => {
-                n1 = self.transform_worker_conc(re.l);
-            }
-            Star => {
-                n1 = self.transform_worker_star(re.l);
-            }
-        }
-        match re.r{
-            Eps => {
-                n2 = self.transform_worker_eps(re.r);
-            }
-            Phi => {
-                n2 = self.transform_worker_phi(re.r);
-            }
-            C => {
-                n2 = self.transform_worker_char(re.r);
-            }
-            Alt => {
-                n2 = self.transform_worker_alt(re.r);
-            }
-            Conc => {
-                n2 = self.transform_worker_conc(re.r);
-            }
-            Star => {
-                n2 = self.transform_worker_star(re.r);
-            }
-        }
-
-        start = self.fresh();
-        stop = self.fresh();
-        let n1_start: i32 = n1.get_initial();
-        let n1_stop: i32 = n1.get_finals()[0];
-        let n2_start: i32 = n2.get_initial();
-        let n2_stop: i32 = n2.get_finals()[0];
-
-        let t1: Vec<Transition> = n1.get_transitions();
-        let t2: Vec<Transition> = n2.get_transitions();
-
-        transitions.insert(transitions.end(),t1.begin(),t1.end()); //<--- why are there 3 arguments? How does insert work in C++?
-   
-
         
-        println!(""); //<-- to stop the return error
+        //check type of left argument to call next transformworker function
+        //type_of(re) -> regular_expression::re::Alt
+        match type_of(re.l){
+            "regular_expression::re::Alt" => {
+                type_of(re.l);
+                n1 = self.transform_worker(re.l); //<- this is my problem: no field `l` on type `S` (but if i use re as a explicid parameter type 'Alt<S,I> i can't make a nested call because its not generic)
+            }
+            //others cases follow...
+            //in other cases i would have to call the transformworker function with another parameter (the parameter re.l)
+        }
+
+        //check type of left argument to call next transformworker function
+        //type_of(re) -> regular_expression::re::Alt
+        match type_of(re.r){
+            "regular_expression::re::Alt" => {
+                n2 = self.transform_worker(re.r); //<- this is my problem: no field `l` on type `S` (but if i use re as a explicid parameter type 'Alt<S,I> i can't make a nested call because its not generic)
+            }
+            //others cases follow...
+            //in other cases i would have to call the transformworker function with another parameter (the parameter re.r)
+        }
+        
+       //more code...
     }
-    fn transform_worker_conc<T:RE, J:RE>(self, re: Conc<T,J> )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![];
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-
-    }
-    fn transform_worker_star<T:RE>(self, re: Star<T> )->NFA{
-        // TODO
-        let mut transitions: Vec<Transition> = vec![];
-        let mut start: i32 = 0;
-        let mut stop: i32 = 0;
-
-
-    }
+    
 }
 
+//TODO
 // transformworker als überladene Methode mit den Instantzen eps, phi,...
 // Die jeweiligen Methoden die zu einem Trait gehören können fuer bestimmte Typen implementiert werden.
 
 pub fn  run (){
-
 }

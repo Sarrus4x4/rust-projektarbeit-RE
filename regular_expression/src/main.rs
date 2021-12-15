@@ -3,9 +3,6 @@ mod re2;
 
 mod ea1;
 mod ea2;
-mod ea3;
-mod ea4;
-
 
 mod codesample_int;
 
