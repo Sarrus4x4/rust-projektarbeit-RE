@@ -6,7 +6,6 @@ mod re3;
 //mod ea1;
 //mod ea2;
 
-mod codesample_int;
 
 
 pub fn main(){
