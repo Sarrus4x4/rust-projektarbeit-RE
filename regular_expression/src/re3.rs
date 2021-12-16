@@ -131,7 +131,7 @@ fn pretty(x : &Exp) -> String {
 //     }
 // }
 
-//simplify Method that also prints the expression
+//simplify Method that also returns the expression ready to be printed (the pretty method is called inside of simplify)
 fn simplify(x : &Exp) -> String { //-> Box<Exp> 
     match x {
 
