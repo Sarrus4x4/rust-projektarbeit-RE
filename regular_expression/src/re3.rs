@@ -76,32 +76,32 @@ fn simplify(x : &Exp) -> Box<Exp> { //-> Box<Exp>
         Exp::Alt{left,right} => {
             //if left is Phi and right is not -> return right
             if (is_phi(left)) && (!is_phi(right)){
-                right
+                right //<-- how can i return this as Box<Exp> ?
             }
 
             //if right is Phi and left is not -> return left
             else if (is_phi(right)) && (!is_phi(left)){
-                left
+                left //<-- how can i return this as Box<Exp> ?
             }
 
             //if left and right are the same  -> return left/right
             else if pretty(&left) == pretty(&right){
-                left
+                left //<-- how can i return this as Box<Exp> ?
             }
             else{
-                x
+                x //<-- how can i return this as Box<Exp> ?
             }
         }
 
         Exp::Conc{left,right} => {
             //if left is eps and right is not -> return right
             if (is_eps(left)) && (!is_eps(right)){
-                right
+                right //<-- how can i return this as Box<Exp> ?
             }
 
             //if right is eps and left is not -> return left
             else if (is_eps(right)) && (!is_eps(left)){
-                left
+                left //<-- how can i return this as Box<Exp> ?
             }
 
             //if left or right (or both) are phi -> return phi
@@ -109,22 +109,22 @@ fn simplify(x : &Exp) -> Box<Exp> { //-> Box<Exp>
                 Box::new(Exp::Phi{})
             }
             else{
-                x
+                x //<-- how can i return this as Box<Exp> ?
             }
         }
 
         Exp::Star{obj} => {
             //if obj is phi -> return eps
             if is_phi(obj){
-                Box::new(Exp::Eps{})
+                Box::new(Exp::Eps{}) 
             }
 
             //if obj is star -> return obj
             else if pretty(&obj).ends_with("*)"){
-                obj
+                obj //<-- how can i return this as Box<Exp> ?
             }
             else{
-                x
+                x //<-- how can i return this as Box<Exp> ?
             }
         }
     }
