@@ -1,4 +1,4 @@
-enum Exp {
+pub enum Exp {
     
     Eps{
         
