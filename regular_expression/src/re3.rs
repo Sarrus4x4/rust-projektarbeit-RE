@@ -51,86 +51,6 @@ fn pretty(x : &Exp) -> String {
     }
 }
 
-
-//first i wanted to use a simplify method before using the pretty method but the simplify method turned out to to the job of pretty already...
-
-// // Show for expressions.
-// fn simplify(x : &Exp) -> Box<Exp> { //-> Box<Exp> 
-//     match x {
-
-//         Exp::Eps{} => {
-//             //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-//             Box::new(Exp::Eps{})
-//         }
-
-//         Exp::Phi{} => {
-//             //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-//             Box::new(Exp::Phi{})
-//         }
-
-//         Exp::Char{val} => {
-//             //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-//             let temp_val: char = *val;
-//             Box::new(Exp::Char{val: temp_val})
-//         } 
-
-//         Exp::Alt{left,right} => {
-//             //if left is Phi and right is not -> return right
-//             if (is_phi(left)) && (!is_phi(right)){
-//                 right //<-- how can i return this as Box<Exp>?
-//             }
-
-//             //if right is Phi and left is not -> return left
-//             else if (is_phi(right)) && (!is_phi(left)){
-//                 left //<-- how can i return this as Box<Exp>?
-//             }
-
-//             //if left and right are the same  -> return left/right
-//             else if pretty(&left) == pretty(&right){
-//                 left //<-- how can i return this as Box<Exp>?
-//             }
-//             else{
-//                 x //<-- how can i return this as Box<Exp>?
-//             }
-//         }
-
-//         Exp::Conc{left,right} => {
-//             //if left is eps and right is not -> return right
-//             if (is_eps(left)) && (!is_eps(right)){
-//                 right //<-- how can i return this as Box<Exp>?
-//             }
-
-//             //if right is eps and left is not -> return left
-//             else if (is_eps(right)) && (!is_eps(left)){
-//                 left //<-- how can i return this as Box<Exp>?
-//             }
-
-//             //if left or right (or both) are phi -> return phi
-//             else if (is_phi(right)) || (is_phi(left)){
-//                 Box::new(Exp::Phi{})
-//             }
-//             else{
-//                 x //<-- how can i return this as Box<Exp>?
-//             }
-//         }
-
-//         Exp::Star{obj} => {
-//             //if obj is phi -> return eps
-//             if is_phi(obj){
-//                 Box::new(Exp::Eps{}) 
-//             }
-
-//             //if obj is star -> return obj
-//             else if pretty(&obj).ends_with("*)"){
-//                 obj //<-- how can i return this as Box<Exp>?
-//             }
-//             else{
-//                 x //<-- how can i return this as Box<Exp>?
-//             }
-//         }
-//     }
-// }
-
 //simplify Method that also returns the expression ready to be printed (the pretty method is called inside of simplify)
 fn simplify(x : &Exp) -> String { //-> Box<Exp> 
     match x {
@@ -252,6 +172,7 @@ pub fn main() {
     let e_final = Box::new(Exp::Conc{left: Box::new(Exp::Eps{}) , right: Box::new(Exp::Conc{left: Box::new(Exp::Star{obj: Box::new(Exp::Star{obj: Box::new(Exp::Char{val : 'a'})}) }) , right: Box::new(Exp::Alt{left: Box::new(Exp::Phi{}) , right: Box::new(Exp::Char{val : 'b'}) })}) });
     println!("This is the final Test: {}",simplify(&e_final));
     //It works! Only the outer braces could be removed later...
+    
 }
 
 
