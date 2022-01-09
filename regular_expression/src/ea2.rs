@@ -39,11 +39,11 @@ impl Automata{
     }
     fn to_state(x: &Automata)->i32{
         let to: i32 = 1;
-        let to2: i32 = x.Transition.to; //I can not use the variants of Enum Automata... Don't know how to solve Part2
+        let to2: i32 = x.Transition.to; //I can not use the variants of Enum Automata... Variants are no Types
         to
     }
     fn trigger(self , _from: i32, _c: char)->bool{
-        !self.Transition.epsilon && _from == self.Transition.from && _c == self.Transition.c  //I can not use the variants of Enum Automata... Don't know how to solve Part2
+        !self.Transition.epsilon && _from == self.Transition.from && _c == self.Transition.c  //I can not use the variants of Enum Automata... 
     }
 }
 
