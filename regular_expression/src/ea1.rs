@@ -51,18 +51,13 @@ pub trait NFARules {
     fn get_initial(self)->i32;
     fn get_finals(self)->Vec<i32>;
 }
-pub trait TransformWorkerRulesAlt{
+pub trait TransformWorkerRules{
     // Kein Plan
     fn init(self);
     fn fresh(self)->i32;
     fn transform<T: RE, J: RE>(self, re: Alt<T,J> );
-    fn transform_worker<T: RE,J: RE>(self, re: Alt<T,J> );
-    //i need to 'overload' the transform_worker function but overloading is not possible in rust -> i need to use multible similar functions with different parameters (Alt, Eps,...) like 'transform_worker_alt' 
-    //if i use multible functions (like 'transform_worker_alt' i would have to implement all of them for all my Types -> multible traits 'TransformWorkerRulesAlt'?)
+    fn transform_worker<T: RE>(self, re: T );
 }
-//do i need mutlible traits for Transformworker?
-
-
 
 
 
@@ -120,11 +115,11 @@ impl NFARules for NFA {
 
 
 
-//In this file i try to implement the TransformWorkerRules for every type (phi, eps,...) seperatly -> TransformWorkerRulesAlt for Type Alt<T,J>
-//I am calling the transformWorker function with the parameter re of type Alt<T,J>
+//In this file i try to implement the TransformWorkerRules for every type (phi, eps,...) seperatly but with the same Trait -> TransformWorkerRules for Type Alt<T,J>
+//I am calling the transformWorker function with the parameter re of a generic Type T: RE
 
 //Implementing the TransformWorkerRules for the Alt type
-impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
+impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRules for Alt<T,J>{
 
     fn init(mut self){
         self.name_supply = 0;
@@ -136,7 +131,7 @@ impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
         self.init();
         self.transform_worker(re)
     }
-    fn transform_worker<S:RE, I:RE>(self, re: Alt<S,I>){
+    fn transform_worker<S:RE>(self, re: S){
         // TODO
         let mut transitions: Vec<Transition> = vec![];
         let mut start: i32 = 0;
@@ -147,37 +142,36 @@ impl <T:RE+NFARules, J:RE+NFARules> TransformWorkerRulesAlt for Alt<T,J>{
         // NFA n2 = transformWorker(r2->getRight());
         
         //this is what i have
-        //i need to know the type of re.l and re.r so i can call the right transformworker function -> this is why i need to use the Alt<S,I> parameter instead of a generic one
-
+        // i need to know the type of re.l and re.r so i can call the right transformworker function
         let n1;
         let n2;
 
+        
         //check type of left argument to call next transformworker function
         //type_of(re) -> regular_expression::re::Alt
         match type_of(re.l){
             "regular_expression::re::Alt" => {
                 type_of(re.l);
-                n1 = self.transform_worker(re.l); //<- this is my problem: expected struct `re2::Alt`, found type parameter `S` (but if i use re as a generic parameter i can't use re.l and re.r)
+                n1 = self.transform_worker(re.l); //<- this is my problem: no field `l` on type `S` (but if i use re as a explicid parameter type 'Alt<S,I> i can't make a nested call because its not generic)
             }
             //others cases follow...
-            //in other cases i would have to call the transformworker function of another Trait (for example the transformWorker that was implemented for Eps)
+            //in other cases i would have to call the transformworker function with another parameter (the parameter re.l)
         }
 
-        //check type of right argument to call next transformworker function
+        //check type of left argument to call next transformworker function
         //type_of(re) -> regular_expression::re::Alt
         match type_of(re.r){
             "regular_expression::re::Alt" => {
-                n2 = self.transform_worker(re.r); //<- this is my problem: expected struct `re2::Alt`, found type parameter `I` (but if i use re as a generic parameter i can't use re.l and re.r)
+                n2 = self.transform_worker(re.r); //<- this is my problem: no field `l` on type `S` (but if i use re as a explicid parameter type 'Alt<S,I> i can't make a nested call because its not generic)
             }
             //others cases follow...
-            //in other cases i would have to call the transformworker function of another Trait (for example the transformWorker that was implemented for Eps)
+            //in other cases i would have to call the transformworker function with another parameter (the parameter re.r)
         }
-
-        //more code...
+        
+       //more code...
     }
     
 }
-
 
 //TODO
 // transformworker als überladene Methode mit den Instantzen eps, phi,...
