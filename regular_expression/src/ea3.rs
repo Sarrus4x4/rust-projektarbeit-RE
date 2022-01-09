@@ -1,4 +1,4 @@
-use crate::re3::Exp;
+use crate::re::Exp;
 
 use std::fmt::Debug;
 

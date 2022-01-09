@@ -1,6 +1,8 @@
-use crate::re3;
-use crate::re3::Exp;
+use crate::re;
+use crate::re::Exp;
 
+
+//A Enum for Transition, NFA and Transformworker might not be a clean solution (not even possible as far as i can tell...)
 
 pub enum Automata {
     Transition{
@@ -15,16 +17,16 @@ pub enum Automata {
     //     epsilon: bool,
     // },
     NFA {
-        transitions: Vec<Automata>, //Vec<Automaa::Transition>
+        transitions: Vec<Automata>, //Vec<Automaa::Transition> //I can not use the variants of Enum Automata... Don't know how to solve Part2
         initial_state: i32,
         final_state: Vec<i32>,
     },
-    TransitionWorker{
+    TransformWorker{
         name_supply: i32,
     }
 }
 
-//impl Automata{
+impl Automata{
     fn eps_transition (_from: i32, _to: i32){
         Box::new(Automata::Transition{from: _from,c: ' ', to: _to, epsilon: true});
     }
@@ -37,10 +39,13 @@ pub enum Automata {
     }
     fn to_state(x: &Automata)->i32{
         let to: i32 = 1;
-        let to2: i32 = x.Transition.to;
+        let to2: i32 = x.Transition.to; //I can not use the variants of Enum Automata... Don't know how to solve Part2
         to
     }
-//}
+    fn trigger(self , _from: i32, _c: char)->bool{
+        !self.Transition.epsilon && _from == self.Transition.from && _c == self.Transition.c  //I can not use the variants of Enum Automata... Don't know how to solve Part2
+    }
+}
 
 
 
