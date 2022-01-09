@@ -17,7 +17,7 @@ pub enum Automata {
     //     epsilon: bool,
     // },
     NFA {
-        transitions: Vec<Automata>, //Vec<Automaa::Transition> //I can not use the variants of Enum Automata... Don't know how to solve Part2
+        transitions: Vec<Automata>, //Vec<Automaa::Transition> //I can not use the variants of Enum Automata... Enum might not be the best way for Part 2 (if even possible)
         initial_state: i32,
         final_state: Vec<i32>,
     },
