@@ -1,5 +1,7 @@
 #[derive( Clone, Debug)]
 
+//enum that contains all building blocks of regular expressions
+//the variants can be called recursive to construct any required expression 
 pub enum Exp {
 
     Eps{
@@ -25,7 +27,7 @@ pub enum Exp {
 
 }
 
-// Show expressions.
+//pretty Method that returns a String with a easily readable expression
 fn pretty(x : &Exp) -> String {
     match x {
         Exp::Eps{} => {
@@ -53,8 +55,8 @@ fn pretty(x : &Exp) -> String {
     }
 }
 
-//simplify Method that also returns the expression ready to be printed (the pretty method is called inside of simplify)
-fn simplify(x : &Exp) -> Exp { //-> Box<Exp> 
+//simplify Method that returns a simplified version of the expression as Exp
+fn simplify(x : &Exp) -> Exp {
     match x {
 
         Exp::Eps{} => {
@@ -160,7 +162,7 @@ pub fn main() {
     // Box::new(Exp::Conc{left: , right: })
     // Box::new(Exp::Alt{left: , right: })
     // Box::new(Exp::Star{obj: })
-
+    
     //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
     let e_final = Box::new(Exp::Conc{left: Box::new(Exp::Eps{}) , right: Box::new(Exp::Conc{left: Box::new(Exp::Star{obj: Box::new(Exp::Star{obj: Box::new(Exp::Char{val : 'a'})}) }) , right: Box::new(Exp::Alt{left: Box::new(Exp::Phi{}) , right: Box::new(Exp::Char{val : 'b'}) })}) });
     println!("This should print the expression tree: {:?}",simplify(&e_final));

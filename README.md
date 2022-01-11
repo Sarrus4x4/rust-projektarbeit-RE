@@ -53,7 +53,7 @@ r1 r2 - Die Konkatenation von r1 mit r2
 r* - Die Kleenesche Hülle um r
 
 
-Mit Hilfe dieses Enums lassen sich also alle beliebeigen regulären Ausdrücke konstruieren, indem man die einzelnen Elemente ineinander verschachtelt. Dies wird im Code durch rekursive Aufrufe umgesetzt. Die drei Varianten **Alt**, **Conc** und **Star** haben hierfür die Argumente **left**, **right** und **obj** die wiederum eine der 6 Variants sein können. Die rekursion endet also bei der Wahl einer der 3 Variants **Eps**, **Phi** und **Char** die keine weitere Schachtelung zulassen.
+Mit Hilfe dieses Enums lassen sich also alle beliebeigen regulären Ausdrücke konstruieren, indem man die einzelnen Elemente ineinander verschachtelt. Dies wird im Code durch rekursive Aufrufe umgesetzt. Die drei Varianten **Alt**, **Conc** und **Star** haben hierfür die Argumente **left**, **right** und **obj** die vom typ __Box&lt;Exp>__ sind und somit wiederum eine der 6 Variants sein können. __Box&lt;Exp>__ statt einem einfachen __Exp__ zu verwenden, ermöglicht den rekursiven Aufruf der einzelnen Variants. Die rekursion endet schließlich bei der Wahl einer der 3 Variants **Eps**, **Phi** und **Char** die keine weitere Schachtelung zulassen.
 
 Die Zeichen des Regulären Ausdrucks werden im Value Argument **val** der Variant **Char** gespeichert. Hier kann ein beliebiger Character gewählt werden.
 
@@ -65,6 +65,8 @@ let re1 = Box::new(Exp::Alt{
     right: Box::new(Exp::Char{val : 'b'}) 
 });
 ``` 
+<br>
+
 Den Ausdruck __a (b | c)*__ bildet man so:
 ```
 let re2 = Box::new(Exp::Conc{
@@ -77,6 +79,9 @@ let re2 = Box::new(Exp::Conc{
     }) 
 });
 ```
+
+<br>
+
 Den Ausdruck __eps ((a*)* (phi | b))__ bildet man so:
 ```
 let re3 = Box::new(Exp::Conc{
@@ -94,7 +99,11 @@ let re3 = Box::new(Exp::Conc{
     }) 
 });
 ```
+
+
 Hierbei ist zu beachten, dass dieser reguläre Ausdruck noch nicht in seiner vereinfachten Form __(a*) b__ vorliegt. Dies führt zum nächsten Thema dieser Projektarbeit.
+
+<br>
 
 # Vereinfachung von Regulären Ausdrücken
 Manche Regulären Ausdrücke lassen sich logisch vereinfachen, wodurch eine übersichtlichere Schreibweise ermöglicht wird. Hierbei bleibt die Bedeutung des Ausdrucks erhalten. Die Regeln nach denen man Reguläre Ausdrücke vereinfachen kann lauten wie folgt:
@@ -128,9 +137,11 @@ let re1 = Box::new(Exp::Conc{
         right: Box::new(Exp::Char{val : 'b'}) 
     }) 
 });
-println!("This is the simplified Version of re1: {}", simplify(&re1));
+println!("This is the simplified Version of re1: {:?}", simplify(&re1));
 ```
 Dieser Code hätte die Ausgabe __This is the simplified Version of re1: Conc { left: Char { val: 'a' }, right: Char { val: 'b' } }__ zur Folge.
+
+<br>
 
 Der Ausdruck __((a)*) *__ lässt sich wegen Regel 4 vereinfachen zu __a *__. Im Code ist das folgendermaßen umsetzbar:
 ```
@@ -139,9 +150,11 @@ let re2 = Box::new(Exp::Star{
         obj: Box::new(Exp::Char{val : 'a'})
     }) 
 });
-println!("This is the simplified Version of re2: {}", simplify(&re2));
+println!("This is the simplified Version of re2: {:?}", simplify(&re2));
 ```
 Dieser Code hätte die Ausgabe __This is the simplified Version of re2: Star { obj: Char { val: 'a' } }__ zur Folge.
+
+<br>
 
 Den Ausdruck __eps ((a*)* (phi | b))__ lässt sich wegen einer Kombination aus mehreren Regeln zu __(a*) b__ vereinfachen. Im Code ist dies folgendermaßen umsetzbar:
 ```
@@ -159,11 +172,15 @@ let re3 = Box::new(Exp::Conc{
         })
     }) 
 });
-println!("This is the simplified Version of re3: {}", simplify(&re3));
+println!("This is the simplified Version of re3: {:?}", simplify(&re3));
 ```
 Dieser Code hätte die Ausgabe __This is the simplified Version of re3: Conc { left: Star { obj: Char { val: 'a' } }, right: Char { val: 'b' } }__ zur Folge.
 
+<br>
+
 Da diese Schreibweise aber immernoch sehr unlesbar ist, wurde zusätzlich eine PrettyPrint methode implementiert, die den Ausdruck ordentlich lesbar zurück gibt. Um diese Funktion soll es als nächstes gehen.
+
+<br>
 
 # Printen von Regulären Ausdrücken
 
@@ -174,6 +191,32 @@ Im Grunde arbeitet diese Funktion ähnlich wie auch ```simplify(x : &Exp) -> Exp
 - Alternative``` "(".to_string() + &pretty(&left) + &"|".to_string()+ &pretty(&right) + &")".to_string();```
 - Concatenation: ```"(".to_string() + &pretty(&left) + &pretty(&right) + &")".to_string();```
 - Star: ```"(".to_string() + &pretty(&obj) + &"*)".to_string();```
+
+Die Pretty Funktion kann direkt auf einen selbst erstellten Ausdruck angewandt werden, oder aber den Return-Wert der Simplify Funktion als Parameter übergeben bekommen.
+
+## **Beispiele**
+
+Es wird erneut der Ausdruck __eps ((a*)* (phi | b))__ betrachtet, wobei dieser zuerst in seiner ursprünglichen Form und anschließend in seiner vereinfachten Form __(a*) b__ auf der Konsole ausgegeben werden soll. 
+
+```
+    let re3 = Box::new(Exp::Conc{
+        left: Box::new(Exp::Eps{}), 
+        right: Box::new(Exp::Conc{
+            left: Box::new(Exp::Star{
+                obj: Box::new(Exp::Star{
+                    obj: Box::new(Exp::Char{val : 'a'})
+                }) 
+            }),
+            right: Box::new(Exp::Alt{
+                left: Box::new(Exp::Phi{}) , 
+                right: Box::new(Exp::Char{val : 'b'}) 
+            })
+        }) 
+    });
+    println!("This is the pretty print of the original re3: {:?}", pretty(&re3));
+    println!("This is the pretty print of the simplified re3: {:?}", pretty(&simplify(&re3)));
+```
+Dieser Code hätte die Ausgabe __This is the pretty print of the original re3: "((((a*)*)(phi|b)))"__ sowie __This is the pretty print of the simplified re3: "((a*)b)"__ zur Folge, wobei die äußeren Klammern in beiden Fällen nicht nötig wären.
 
 # **Aufgabenteil 2 - Transformation von Regulären Ausdrücken in Automaten**
 
