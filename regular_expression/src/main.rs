@@ -2,12 +2,12 @@
 //mod re2;
 
 mod re;
-mod ea2;
-mod ea3;
+//mod ea2;
+//mod ea3;
 
 
 
 
 pub fn main(){
-    re::main();
+    re::main()
 }

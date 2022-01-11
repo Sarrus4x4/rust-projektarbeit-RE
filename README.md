@@ -115,8 +115,8 @@ Manche Regulären Ausdrücke lassen sich logisch vereinfachen, wodurch eine übe
 ```
 Hiebei ist zu beachten, dass es sich bei ```L(r1)={}``` um einen Regulären Ausdruck handelt, der die leere Sprache bildet. 
 
-Die Vereinfachung von Regulären Ausdrücken wird in diesem Projekt durch die Funktion ```simplify(x : &Exp) -> String {}``` geregelt, die einen Regulären Ausdruck vom Typ **Exp** erhält und diesen vereinfacht als einen String zurück gibt.
-Hierbei wird rekursiv gearbeitet und  geprüft ob beim aktuellen Element des Ausdrucks eine der 7 Vereinfachungsregeln Anwendung findet. Falls es keine möglichen Vereinfachungen gibt, wird der Ausdruck unverändert als String zurückgegeben.
+Die Vereinfachung von Regulären Ausdrücken wird in diesem Projekt durch die Funktion ```simplify(x : &Exp) -> Exp {}``` geregelt, die einen Regulären Ausdruck vom Typ **Exp** erhält und diesen als vereinfachten Ausdruck zurück gibt, der ebenfalls als Typ **Exp** gespeichert ist.
+Hierbei wird rekursiv gearbeitet und  geprüft ob beim aktuellen Element des Ausdrucks eine der 7 Vereinfachungsregeln Anwendung findet. Falls es keine möglichen Vereinfachungen gibt, wird der Ausdruck unverändert zurückgegeben.
 
 ## **Beispiele**
 Der Ausdruck __a (b|b)__ lässt sich wegen Regel 6 vereinfachen zu __a b__. Im Code ist das folgendermaßen umsetzbar:
@@ -130,7 +130,7 @@ let re1 = Box::new(Exp::Conc{
 });
 println!("This is the simplified Version of re1: {}", simplify(&re1));
 ```
-Dieser Code hätte die Ausgabe __This is the simplified Version of re1: (ab)__ zur Folge, wobei die äußeren Klammern nicht nötig wären.
+Dieser Code hätte die Ausgabe __This is the simplified Version of re1: Conc { left: Char { val: 'a' }, right: Char { val: 'b' } }__ zur Folge.
 
 Der Ausdruck __((a)*) *__ lässt sich wegen Regel 4 vereinfachen zu __a *__. Im Code ist das folgendermaßen umsetzbar:
 ```
@@ -141,7 +141,7 @@ let re2 = Box::new(Exp::Star{
 });
 println!("This is the simplified Version of re2: {}", simplify(&re2));
 ```
-Dieser Code hätte die Ausgabe __This is the simplified Version of re2: (a)*__ zur Folge, wobei die äußeren Klammern nicht nötig wären.
+Dieser Code hätte die Ausgabe __This is the simplified Version of re2: Star { obj: Char { val: 'a' } }__ zur Folge.
 
 Den Ausdruck __eps ((a*)* (phi | b))__ lässt sich wegen einer Kombination aus mehreren Regeln zu __(a*) b__ vereinfachen. Im Code ist dies folgendermaßen umsetzbar:
 ```
@@ -161,9 +161,19 @@ let re3 = Box::new(Exp::Conc{
 });
 println!("This is the simplified Version of re3: {}", simplify(&re3));
 ```
-Dieser Code hätte die Ausgabe __This is the simplified Version of re3: ((a*)b)__ zur Folge, wobei die äußeren Klammern nicht nötig wären.
+Dieser Code hätte die Ausgabe __This is the simplified Version of re3: Conc { left: Star { obj: Char { val: 'a' } }, right: Char { val: 'b' } }__ zur Folge.
 
-Alternativ kann der reguläre Ausdruck aber auch ohne Anwendung von Vereinfachungsregeln mit der Funktion ```pretty(x : &Exp) -> String {} ``` Verarbeitet werden, die ebenfalls einen Ausdruck vom Typ **Exp** erhält und einen String zurück gibt. 
+Da diese Schreibweise aber immernoch sehr unlesbar ist, wurde zusätzlich eine PrettyPrint methode implementiert, die den Ausdruck ordentlich lesbar zurück gibt. Um diese Funktion soll es als nächstes gehen.
+
+# Printen von Regulären Ausdrücken
+
+Die lesbare Darstellung von Regulären Ausdrücken wird in diesem Code mit der Funktion ```pretty(x : &Exp) -> String {} ``` umgesetzt die ebenfalls einen Ausdruck vom Typ **Exp** erhält und diesen als ein String zurück gibt. 
+
+Im Grunde arbeitet diese Funktion ähnlich wie auch ```simplify(x : &Exp) -> Exp {}```, indem sie rekursiv durch den Ausdruck schreitet und das aktuelle element, statt es zu vereinfachen, in einen String umwandelt. Bei Elementen, die wiederum ein **left**, **right** oder **obj** enthalten, wird eine tiefere Schachtelung aufgerufen.
+
+- Alternative``` "(".to_string() + &pretty(&left) + &"|".to_string()+ &pretty(&right) + &")".to_string();```
+- Concatenation: ```"(".to_string() + &pretty(&left) + &pretty(&right) + &")".to_string();```
+- Star: ```"(".to_string() + &pretty(&obj) + &"*)".to_string();```
 
 # **Aufgabenteil 2 - Transformation von Regulären Ausdrücken in Automaten**
 

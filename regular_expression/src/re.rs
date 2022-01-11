@@ -1,5 +1,7 @@
+#[derive( Clone, Debug)]
+
 pub enum Exp {
-    
+
     Eps{
         
     },
@@ -52,25 +54,19 @@ fn pretty(x : &Exp) -> String {
 }
 
 //simplify Method that also returns the expression ready to be printed (the pretty method is called inside of simplify)
-fn simplify(x : &Exp) -> String { //-> Box<Exp> 
+fn simplify(x : &Exp) -> Exp { //-> Box<Exp> 
     match x {
 
         Exp::Eps{} => {
-            //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-            let e = "";
-            e.to_string()
+            *Box::new(Exp::Eps{})
         }
 
         Exp::Phi{} => {
-            //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-            let e = "phi";
-            e.to_string()
+            *Box::new(Exp::Phi{})
         }
 
         Exp::Char{val} => {
-            //simply return the given parameter x (currently returning new Exp because i dont know how to return x)
-            let e = *val;
-            e.to_string()
+            *Box::new(Exp::Char{val: *val})
         } 
 
         Exp::Alt{left,right} => {
@@ -88,9 +84,10 @@ fn simplify(x : &Exp) -> String { //-> Box<Exp>
             else if pretty(&left) == pretty(&right){
                 simplify(left) 
             }
+
+            //if no special case occurs i need to return a Alt with two simplified arguments
             else{
-                let e = "(".to_string() + &simplify(&left) + &"|".to_string()+ &simplify(&right) + &")".to_string();
-                e
+                *Box::new(Exp::Alt{ left: Box::new(simplify(left)), right: Box::new(simplify(right))})
             }
         }
 
@@ -107,30 +104,29 @@ fn simplify(x : &Exp) -> String { //-> Box<Exp>
 
             //if left or right (or both) are phi -> return phi
             else if (is_phi(right)) || (is_phi(left)){
-                let e = "phi";
-                e.to_string()
+                *Box::new(Exp::Phi{})
             }
+
+            //if no special case occurs i need to return a Conc with two simplified arguments
             else{
-                let e = "(".to_string() + &simplify(&left) + &simplify(&right) + &")".to_string();
-                e 
+                *Box::new(Exp::Conc{ left: Box::new(simplify(left)), right: Box::new(simplify(right))})
             }
         }
 
         Exp::Star{obj} => {
             //if obj is phi -> return eps
             if is_phi(obj){
-                let e = "";
-                e.to_string() 
+                *Box::new(Exp::Eps{})
             }
 
             //if obj is star -> return obj
             else if pretty(&obj).ends_with("*)"){
-                let e = simplify(&obj);
-                e 
+                simplify(&obj)
             }
+
+            //if no special case occurs i need to return a Star with a simplified argument
             else{
-                let e = "(".to_string() + &simplify(&obj) + &"*)".to_string();
-                e
+                *Box::new(Exp::Star{ obj: Box::new(simplify(obj))})
             }
         }
     }
@@ -165,14 +161,11 @@ pub fn main() {
     // Box::new(Exp::Alt{left: , right: })
     // Box::new(Exp::Star{obj: })
 
-    let e1 = Box::new(Exp::Char{val : 'a'});
-    println!("This is a test: {}",pretty(&e1));
-
     //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
     let e_final = Box::new(Exp::Conc{left: Box::new(Exp::Eps{}) , right: Box::new(Exp::Conc{left: Box::new(Exp::Star{obj: Box::new(Exp::Star{obj: Box::new(Exp::Char{val : 'a'})}) }) , right: Box::new(Exp::Alt{left: Box::new(Exp::Phi{}) , right: Box::new(Exp::Char{val : 'b'}) })}) });
-    println!("This is the final Test: {}",simplify(&e_final));
-    //It works! Only the outer braces could be removed later...
-    
+    println!("This should print the expression tree: {:?}",simplify(&e_final));
+    println!("This should print the expression: {:?}",pretty(&simplify(&e_final)));
+
 }
 
 
