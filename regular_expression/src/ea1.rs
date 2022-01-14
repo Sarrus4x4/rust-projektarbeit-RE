@@ -1,15 +1,9 @@
 //use crate::re;
-use crate::re2::RE;
+use crate::re::Exp;
 //use std::any::type_name;
 use std::fmt::Debug;
 
-//extern crate re;
-use crate::re2::Eps;
-use crate::re2::Phi;
-use crate::re2::C;
-use crate::re2::Alt;
-use crate::re2::Conc;
-use crate::re2::Star;
+
 
 use std::any::type_name;
 
