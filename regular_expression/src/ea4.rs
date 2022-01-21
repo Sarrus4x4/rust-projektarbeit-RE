@@ -91,7 +91,7 @@ impl TransformWorker{
                 start = self.fresh();
                 stop.push(self.fresh());
                 
-                let trans1 = Transition{from: start, char: '\0' ,to: stop.pop().unwrap() };
+                let trans1 = Transition{from: start, char: '\0' ,to: stop.last().copied().unwrap() };
                 transitions.push(trans1);
                 let nfa = NFA{transitions: transitions, initial_state: start, final_state: stop};
                 nfa
@@ -109,7 +109,7 @@ impl TransformWorker{
                 start = self.fresh();
                 stop.push(self.fresh());
 
-                let trans1 = Transition{from: start, char: *val ,to: stop.pop().unwrap() };
+                let trans1 = Transition{from: start, char: *val ,to: stop.last().copied().unwrap() }; //stop is same as start -> i need to increase stop
                 transitions.push(trans1);
                 let nfa = NFA{transitions: transitions, initial_state: start, final_state: stop};
                 nfa
@@ -118,9 +118,6 @@ impl TransformWorker{
             Exp::Alt{left,right} => {
 
                 n1 = self.transform_worker(left);
-                let test = n1.clone(); //vielleicht bringt das ja auch was... aber ich kann 'test' dann auchn nur einmal benutzen, bevor er über move meckert
-                let n1_poiner: *const NFA = &n1; //vielleicht bringt der Pointer was beim lösen von dem Move Problem (Wie es aussieht bringt mich das auch nicht weiter)
-                //https://stackoverflow.com/questions/28800121/what-do-i-have-to-do-to-solve-a-use-of-moved-value-error
                 //bringt mich Box hier weiter?
 
                 //aktuell 'löse' ich mein problem mit .clone()
@@ -130,6 +127,7 @@ impl TransformWorker{
                 //Generate new start and stop
                 start = self.fresh();
                 stop.push(self.fresh());
+
                 let n1_start: i32 = n1.clone().get_initial();
                 let n1_stop: i32 = n1.clone().get_finals()[0]; //move error
                 let n2_start: i32 = n2.clone().get_initial(); //move error
@@ -144,8 +142,8 @@ impl TransformWorker{
 
                 let trans1 = Transition{from: start, char: '\0' ,to: n1_start };
                 let trans2 = Transition{from: start, char: '\0' ,to: n2_start };
-                let trans3 = Transition{from: n1_stop, char: '\0', to: stop.pop().unwrap()};
-                let trans4 = Transition{from: n2_stop, char: '\0', to: stop.pop().unwrap()};
+                let trans3 = Transition{from: n1_stop, char: '\0', to: stop.last().copied().unwrap()}; // <- replaced stop.pop().unwrap() with this 
+                let trans4 = Transition{from: n2_stop, char: '\0', to: stop.last().copied().unwrap()};
                 transitions.extend([trans1, trans2, trans3, trans4]);
         
                 let nfa = NFA{transitions: transitions, initial_state: start, final_state: stop};
@@ -155,19 +153,22 @@ impl TransformWorker{
             Exp::Conc{left,right} => {
                 n1 = self.transform_worker(left);
                 start = n1.clone().get_initial();
+
+                //add transitions of n1 to transitions-list
                 for t in 1..n1.clone().get_transitions().len(){ //move error
                     transitions.push(n1.clone().get_transitions()[t]);
                 }    
 
                 for t in 1..n1.clone().get_finals().len(){
-                    let mut  n = self.transform_worker(right);
-                    n.initial_state = n1.clone().get_finals()[t]; //move error
+                    //create multible versions of n2 and set there starts as the finals of n1
+                    let mut  n2 = self.transform_worker(right);
+                    n2.initial_state = n1.clone().get_finals()[t]; //move error
                     
-                    for t in 1..n.clone().get_transitions().len(){
-                        transitions.push(n1.clone().get_transitions()[t]); //move error
+                    for t in 1..n2.clone().get_transitions().len(){
+                        transitions.push(n2.clone().get_transitions()[t]); //move error //this was n1 before but i think it should be n2
                     }
-                    for t in 1..n.clone().get_finals().len(){ //move error
-                        stop.push(n.clone().final_state[t]); //move error
+                    for t in 1..n2.clone().get_finals().len(){ //move error
+                        stop.push(n2.clone().final_state[t]); //move error
                     }
                 }
                 
@@ -177,19 +178,19 @@ impl TransformWorker{
 
             Exp::Star{obj} => {
                 start = self.fresh();
-                stop.push(self.fresh());
+                stop.push(self.fresh()); // i think stop is not incremented 
 
                 n1 = self.transform_worker(obj);
                 
                 for t in 1..n1.clone().get_finals().len(){
                     let trans1 = Transition{from: n1.clone().get_finals()[t], char: '\0' ,to: n1.clone().get_initial() }; //move error
                     transitions.push(trans1);
-                    let trans2 = Transition{from: n1.clone().get_finals()[t], char: '\0', to: stop.pop().unwrap() }; //move error
+                    let trans2 = Transition{from: n1.clone().get_finals()[t], char: '\0', to: stop.last().copied().unwrap() }; //move error //this might be the solution! dont pop but just read last element
                     transitions.push(trans2);
                 }
                 let transition1 = Transition{from: start, char: '\0', to: n1.clone().get_initial()};
                 transitions.push(transition1);
-                let transition2 = Transition{from: start, char: '\0', to: stop.pop().unwrap()};
+                let transition2 = Transition{from: start, char: '\0', to: stop.last().copied().unwrap()};
                 transitions.push(transition2);
                 
                 let nfa = NFA{transitions: transitions, initial_state: start, final_state: stop};
@@ -202,8 +203,14 @@ impl TransformWorker{
 pub fn  run (){
     let e_final = Box::new(Exp::Conc{left: Box::new(Exp::Eps{}) , right: Box::new(Exp::Conc{left: Box::new(Exp::Star{obj: Box::new(Exp::Star{obj: Box::new(Exp::Char{val : 'a'})}) }) , right: Box::new(Exp::Alt{left: Box::new(Exp::Phi{}) , right: Box::new(Exp::Char{val : 'b'}) })}) });
 
+    let test1 = Box::new(Exp::Char{val: 'a'});
+    let test2 = Box::new(Exp::Conc{left: Box::new(Exp::Char{val: 'a'}) , right: Box::new(Exp::Char{val: 'b'})});
+    let test3 = Box::new(Exp::Alt{left: Box::new(Exp::Char{val: 'a'}) , right: Box::new(Exp::Char{val: 'b'})});
+    let test4 = Box::new(Exp::Star{obj: Box::new(Exp::Char{val: 'a'})});
+
     let a = TransformWorker{name_supply: 0};
-    let b = a.transform_worker(&e_final);
+    let b = a.transform_worker(&test1);
+
     println!("This is a Test: {:?}", b);
 
 }
