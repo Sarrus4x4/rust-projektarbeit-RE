@@ -5,13 +5,13 @@ Informationen über Rust habe ich hierbei aus einer Vielzahl and Tutorials und d
 
 Der [Leitfaden zur Aufgabenstellung](https://sulzmann.github.io/SoftwareProjekt/labor.html#(10)) wurde dabei vom betreuenden Professor zur Verfügung gestellt. 
 
-Ein Grundlegendes Verständis der Thematik 'Reguläre Ausdrücke und deren Bildungsgesetze' ist zur Nachvollziehbarkeit dieser Arbeit unumgänglich. 
+Ein Grundlegendes Verständis der Thematik 'Reguläre Ausdrücke und deren Bildungsgesetze' sowie 'Endliche Automaten' ist zur Nachvollziehbarkeit dieser Arbeit unumgänglich. 
 
 # **Verwendete Software und Entwicklungsumgebung**
 Der Code für diese Projektarbeit wurde mithilfe von [Visual Studio Code](https://code.visualstudio.com/) entwickelt. Hierbei kamen außerdem die [standard Erweiterung](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust) für Rust sowie [Rust and Friends](https://marketplace.visualstudio.com/items?itemName=nyxiative.rust-and-friends) zum einsatz. Für die Arbeit mit Github wurde zusätzlich noch [TortoiseGit](https://tortoisegit.org/) verwendet.
 
 # **Aufgabenteil 1 - Reguläre Ausdrücke**
-# Erstellen von Regulären Ausdrücken
+# Konstruktion von Regulären Ausdrücken
 Aufgabe war es, die aus der theoretischen Informatik bekannten Regulären Ausdrücke generieren zu können. Hierzu wurde das Enum ***Exp*** mit den Variants **Eps**, **Phi**, **Char**, **Alt**, **Conc** und ***Star*** verwendet.
 
 ``` 
@@ -178,7 +178,7 @@ Dieser Code hätte die Ausgabe __This is the simplified Version of re3: Conc { l
 
 <br>
 
-Da diese Schreibweise aber immernoch sehr unlesbar ist, wurde zusätzlich eine PrettyPrint methode implementiert, die den Ausdruck ordentlich lesbar zurück gibt. Um diese Funktion soll es als nächstes gehen.
+Da diese Schreibweise aber immernoch sehr unlesbar ist, wurde zusätzlich eine PrettyPrint Funktion implementiert, die den Ausdruck ordentlich lesbar zurück gibt. Um diese Funktion soll es als nächstes gehen.
 
 <br>
 
@@ -218,9 +218,36 @@ Es wird erneut der Ausdruck __eps ((a*)* (phi | b))__ betrachtet, wobei dieser z
 ```
 Dieser Code hätte die Ausgabe __This is the pretty print of the original re3: "((((a*)*)(phi|b)))"__ sowie __This is the pretty print of the simplified re3: "((a*)b)"__ zur Folge, wobei die äußeren Klammern in beiden Fällen nicht nötig wären.
 
-# **Aufgabenteil 2 - Transformation von Regulären Ausdrücken in Automaten**
+# **Aufgabenteil 2 - Endliche Automaten**
 
-Dieser Teil der Ausarbeitung ist noch nicht finalisiert, da die Arbeit am Code noch andauert. Gerüchten zufolge ist der Student mental am Ende weiß nicht mehr, wie er weiter machen soll. 
+# Konstruktion von Endlichen Automaten
+
+Ein Endlicher Automat besteht in diesem Anwendungsfall aus einem Startzustand: **initial_state**, einer Reihe an Zustandsübergängen: **transitions** und einem Endzustand: **final_state**. Die Zustandsübergänge verfügen hierbei über einen Ausgangszustand: **from** und einen Zielzustand: **to**, sowie das zu verarbeitende Zeichen: **char**. Sollte es sich bei dem Zustandübergang um einen spontanen Übergang handeln, so wird der leere Character als ersatz für das leere Wort **Epsilon** verwendet. 
+
+Die besagten Automaten sind in diesem Projekt als **NFA** folgendermaßen implementiert:
+```
+pub struct NFA{
+    pub transitions: Vec<Transition>,
+    pub initial_state: i32,
+    pub final_state: i32,
+}
+```
+Zustandübergänge werden wiederum so abgebildet:
+```
+pub struct Transition{
+    pub from: i32,
+    pub char: char,
+    pub to: i32,
+}
+```
+# Transformation von Regulären Ausdrücken in Endliche Automaten
+
+In diesem Abschnitt geht es darum, die Regulären Ausdrücke aus Aufgabenteil 1 in eben erklärte Endliche Automaten umzuwandeln. Hierbei wird nach den Regeln des [Thompson NFA Algorithmus](https://en.wikipedia.org/wiki/Thompson%27s_construction) vorgegangen, der für alle 6 möglichen Elemente eines Regulären Ausdrucks Bildungsgesetze für Automaten enthält. Um den Umfang dieser Ausarbeitung in Grenzen zu halten, wird die Vertrautheit der Lesenden mit eben diesen Bildungsgesetzen als bekannt vorrausgesetzt.
+
+Die Transformation wird in diesem Projekt von dem Struct **TransformWorker** umgesetzt, der über eine namensgebende Funktion ```fn transform_worker(self, re: &Exp)->Box<NFA>``` verfügt. Sie erhällt einen Regulären Ausdruck vom Typ **Exp** und gibt zurück .....
+
+
+
 
 # **Aufgabenteil 3 - Ausführen von Automaten**
 Dieser Teil der Ausarbeitung existiert noch nicht, da die Arbeit am Code noch nicht begonnen hat.
