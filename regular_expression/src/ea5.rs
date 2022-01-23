@@ -67,18 +67,22 @@ impl NFA {
 //TODO: 
 impl TransformWorker{
 
-    fn init(mut self){
+    fn init(&mut self){
         self.name_supply = 0;
     }
-    fn fresh(mut self)->i32 {
-        self.name_supply = self.name_supply + 1;
+    fn incr(&mut self) {
+        //&self.name_supply = &self.name_supply + 1;
+        self.name_supply += 1;
+    }
+    fn get(&self)-> i32 {
+        //&self.name_supply = &self.name_supply + 1;
         self.name_supply
     }
-    fn transform(self, re: &Exp )->Box<NFA>{
+    fn transform(mut self, re: &Exp )->Box<NFA>{
         self.init();
         self.transform_worker(re)
     }
-    fn transform_worker(self, re: &Exp)->Box<NFA>{
+    fn transform_worker(mut self, re: &Exp)->Box<NFA>{
 
         let mut transitions: Vec<Transition> = vec![];
         let mut start: i32;
@@ -89,8 +93,10 @@ impl TransformWorker{
 
         match re {
             Exp::Eps{} => {
-                start = self.fresh();
-                stop = self.fresh();
+                self.incr();
+                start = self.get();
+                self.incr();
+                stop = self.get();
                 
                 let trans1 = Transition{from: start, char: '\0' ,to: stop };
                 transitions.push(trans1);
@@ -99,15 +105,17 @@ impl TransformWorker{
             }
 
             Exp::Phi{} => {
-                start = self.fresh();
-                stop = self.fresh();
-
-                Box::new(NFA{transitions: transitions, initial_state: start, final_state: stop})
+                self.incr();
+                start = self.get();
+                
+                Box::new(NFA{transitions: transitions, initial_state: start, final_state: start})
             }
 
             Exp::Char{val} => {
-                start = self.fresh();
-                stop = self.fresh();
+                self.incr();
+                start = self.get();
+                self.incr();
+                stop = self.get();
 
                 let trans1 = Transition{from: start, char: *val ,to: stop }; //stop is same as start -> i need to increase stop
                 transitions.push(trans1);
@@ -116,13 +124,19 @@ impl TransformWorker{
             }
 
             Exp::Alt{left,right} => {
-
+                self.incr();
+                start = self.get();
+                
                 n1 = self.transform_worker(left);
+                self.incr();
+                self.incr();
                 n2 = self.transform_worker(right);
-            
+                self.incr();
+                self.incr();
                 //Generate new start and stop
-                start = self.fresh();
-                stop = self.fresh();
+
+                self.incr();
+                stop = self.get();
 
                 let n1_start: i32 = n1.clone().get_initial();
                 let n1_stop: i32 = n1.clone().get_finals(); //move error
@@ -146,11 +160,16 @@ impl TransformWorker{
             }
 
             Exp::Conc{left,right} => {
+                
                 n1 = self.transform_worker(left);
+                self.incr();
+                start = self.get();
+                
+            
+                
                 n2 = self.transform_worker(right);
-
-                start = self.fresh();
-                stop = self.fresh();
+                self.incr();
+                stop = self.get();
 
                 let n1_start: i32 = n1.clone().get_initial();
                 let n1_stop: i32 = n1.clone().get_finals(); //move error
@@ -163,20 +182,24 @@ impl TransformWorker{
                 transitions.extend(t1); 
                 transitions.extend(t2);
 
-                let transition1 = Transition{from: start, char: '\0', to: n1_start};
-                transitions.push(transition1);
-                let transition2 = Transition{from: n1_stop, char: '\0', to: n2_start};
-                transitions.push(transition2);                
+                // let transition1 = Transition{from: start, char: '\0', to: n1_start};
+                // transitions.push(transition1);
+                // let transition2 = Transition{from: n1_stop, char: '\0', to: n2_start};
+                // transitions.push(transition2);                
         
-                Box::new(NFA{transitions: transitions, initial_state: start, final_state: stop})
+                Box::new(NFA{transitions: transitions, initial_state: n1_start, final_state: n2_stop})
             }
 
             Exp::Star{obj} => {
              // i think stop is not incremented 
+                self.incr();
+                start = self.get();
+                
                 n1 = self.transform_worker(obj);
-
-                start = self.fresh();
-                stop = self.fresh();
+                self.incr();
+                self.incr();
+                self.incr();
+                stop = self.get();
 
                 let n1_start: i32 = n1.clone().get_initial();
                 let n1_stop: i32 = n1.clone().get_finals();
@@ -184,12 +207,14 @@ impl TransformWorker{
                 let n1: Vec<Transition> = n1.clone().get_transitions();
                 transitions.extend(n1);
 
-                let transition1 = Transition{from: start, char: '\0', to: n1_stop};
+                let transition1 = Transition{from: start, char: '\0', to: n1_start};
                 transitions.push(transition1);
                 let transition2 = Transition{from: start, char: '\0', to: stop};
                 transitions.push(transition2);
-                let transition3 = Transition{from: n1_start, char: '\0', to: stop};
+                let transition3 = Transition{from: n1_stop, char: '\0', to: stop};
                 transitions.push(transition3);
+                let transition4 = Transition{from: n1_stop, char: '\0', to: n1_start};
+                transitions.push(transition4);
                 
                 Box::new(NFA{transitions: transitions, initial_state: start, final_state: stop})
             }
@@ -204,12 +229,14 @@ pub fn  run (){
     let test2 = Box::new(Exp::Conc{left: Box::new(Exp::Char{val: 'a'}) , right: Box::new(Exp::Char{val: 'b'})});
     let test3 = Box::new(Exp::Alt{left: Box::new(Exp::Char{val: 'a'}) , right: Box::new(Exp::Char{val: 'b'})});
     let test4 = Box::new(Exp::Star{obj: Box::new(Exp::Char{val: 'c'})});
+    let test5 = Box::new(Exp::Eps{});
+    let test6 = Box::new(Exp::Phi{});
 
 
     
     let a = TransformWorker{name_supply: 10};
     //let b = a.transform_worker(&test2);
-    let b = a.transform(&test2);
+    let b = a.transform(&test5);
 
     println!("This is a Test: {:?}", b);
 
