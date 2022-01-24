@@ -244,10 +244,14 @@ pub struct Transition{
 
 In diesem Abschnitt geht es darum, die Regulären Ausdrücke aus Aufgabenteil 1 in eben erklärte Endliche Automaten umzuwandeln. Hierbei wird nach den Regeln des [Thompson NFA Algorithmus](https://en.wikipedia.org/wiki/Thompson%27s_construction) vorgegangen, der für alle 6 möglichen Elemente eines Regulären Ausdrucks Bildungsgesetze für Automaten enthält. Um den Umfang dieser Ausarbeitung in Grenzen zu halten, wird die Vertrautheit der Lesenden mit eben diesen Bildungsgesetzen als bekannt vorrausgesetzt.
 
-Die Transformation wird in diesem Projekt von dem Struct **TransformWorker** umgesetzt, der über eine namensgebende Funktion ```fn transform_worker(self, re: &Exp)->Box<NFA>``` verfügt. Sie erhällt einen Regulären Ausdruck vom Typ **Exp** und gibt zurück .....
+Die Transformation wird in diesem Projekt von dem Struct **TransformWorker** umgesetzt, der über eine namensgebende Funktion ```fn transform_worker(self, re: &Exp)->Box<NFA>``` verfügt. Sie erhällt einen Regulären Ausdruck vom Typ **Exp** und gibt einen **NFA** zurück. Die Funktion läuft rekursiv über die einzlenen Bestandteile des Regulären Ausdrucks und erstellt entsprechende Zustandsübergänge (**transitions**). Die Funktion ```transform_worker``` macht hierbei Gebraucht von den Hilfsfunktionen ```fn incr(&mut self)``` und ```fn get(&self)-> i32``` die dafür sorgen, dass die Zustandsnummern bei fortlaufender Automatenbildung erhöht werden. Ursprünglich wird  ```transform_worker``` jedoch von ```fn transform(mut self, re: &Exp )->Box<NFA>``` aufgerufen, die davor noch ```fn init(&mut self)``` ausführt um die Zustandsnummer **name_supply** auf 0 zu initialisieren. 
 
-
-
+Der Struct **TransformWorker** ist hierbei vergleichsweise unspäktakulär:
+```
+pub struct TransformWorker{
+      pub name_supply: i32 
+}
+```
 
 # **Aufgabenteil 3 - Ausführen von Automaten**
-Dieser Teil der Ausarbeitung existiert noch nicht, da die Arbeit am Code noch nicht begonnen hat.
+Dieser Teil der Ausarbeitung ist noch nicht vollständig, da der Code noch nicht fehlerfrei funktioniert.
