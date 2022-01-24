@@ -1,10 +1,11 @@
 mod ausdruck;
 mod automat;
+mod sprache;
 
 
 
 
 pub fn main(){
-    ausdruck::main();
-    automat::run();
+    //ausdruck::main();
+    sprache::run(automat::run());
 }
