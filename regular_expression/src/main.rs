@@ -1,18 +1,10 @@
-//mod re1;
-//mod re2;
-
-mod re;
-//mod ea1;
-//mod ea2;
-//mod ea3;
-mod ea4;
-mod ea5;
+mod ausdruck;
+mod automat;
 
 
 
 
 pub fn main(){
-    //re::main();
-    //ea4::run();
-    ea5::run();
+    ausdruck::main();
+    automat::run();
 }
