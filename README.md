@@ -254,4 +254,18 @@ pub struct TransformWorker{
 ```
 
 # **Aufgabenteil 3 - Ausführen von Automaten**
-Dieser Teil der Ausarbeitung ist noch nicht vollständig, da der Code noch nicht fehlerfrei funktioniert.
+In dem dritten und letzten Aufgabenteil dieser Arbeit werden die oben erstellten Automaten ausgeführt, um zu überprüfen ob ein gegebenes Wort in der entsprechenden Sprache enthalten ist oder nicht. Es ist zu beachten, dass hierbei von den groben Vorgaben des zuvor erwähnten [Aufgaben-Leitfadens](https://sulzmann.github.io/SoftwareProjekt/labor.html#(10)) abgewichen wurde.
+
+Um die Überprüfung zu realisieren wird eine Struct **Language** verwendet, die über die Parameter **current**, **new** und **nfa** verfügt.
+```
+ pub struct Language{
+    pub current: Vec<i32>,
+    pub new: Vec<i32>,
+    pub nfa: NFA,
+}
+```
+Bei **current** handelt es sich um eine Liste an Zuständen, in denen man sich bei der Ausführung des Automaten befindet. Der Parameter **new** wird dabei verwendet um hinzukommende Zustände zu verwalten. Zuletzt ist **nfa** der Automat für den überprüft werden soll, ob sich ein bestimmtes Wort damit bilden lässt. 
+
+
+
+....Rest der Dokumentation wird in Kürze ergänzt!
