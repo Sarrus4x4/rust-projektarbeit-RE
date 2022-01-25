@@ -148,8 +148,14 @@ pub fn run(nfa: NFA){
 
     let mut word_to_check = "aaaab";
 
+    println!("Is the provided word is {}.", word_to_check);
+
     let sprache = Language{nfa, new: vec![], current: vec![]};
     let return_value = sprache.function(&mut word_to_check);
 
-    println!("Is the provided word {} in the given language? \n {}",word_to_check, return_value);
+    if return_value{
+        println!("Is the provided word is part of the language and can be therefore created by executing the created automata. \n");
+    }else{
+        println!("Is the provided word is NOT part of the language and can therefore NOT be created by executing the created automata! \n");
+    }
 }

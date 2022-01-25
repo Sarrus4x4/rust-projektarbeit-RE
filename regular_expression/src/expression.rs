@@ -178,8 +178,8 @@ pub fn run()-> Exp {
     
     let simplified_expression = simplify(&test_expression);
 
-    println!("This is the expression tree: {:?} \n",simplified_expression);
-    println!("This is the readable expression: {:?} \n",pretty(&simplified_expression));
+    println!("This is the expression tree:\n{:?} \n",simplified_expression);
+    println!("This is the readable expression:\n{:?} \n",pretty(&simplified_expression));
 
     //return the simplified expression
     simplified_expression

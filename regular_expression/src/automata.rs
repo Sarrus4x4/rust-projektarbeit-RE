@@ -189,7 +189,7 @@ pub fn  run (exp: Exp)->NFA{
     let my_transformworker = TransformWorker{name_supply: 0};
     let my_nfa = my_transformworker.transform(&exp);
 
-   println!("This is the created NFA: {:?} \n", my_nfa); //for debugging or display
+   println!("This is the created NFA (not that readable):\n{:?}\n", my_nfa); //for debugging or display
 
    //return the created nfa
    *my_nfa
