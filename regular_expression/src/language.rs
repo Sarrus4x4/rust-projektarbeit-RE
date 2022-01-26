@@ -144,18 +144,21 @@ pub fn consume_char(wort: &mut &str)->char{
     c
 }
 
-pub fn run(nfa: NFA){
+pub fn run(nfa: NFA, word_to_check: &mut &str){
 
-    let mut word_to_check = "aaaab";
-
-    println!("Is the provided word is {}.", word_to_check);
+    //comment out for mass test
+    //println!("Is the provided word is {}.", word_to_check);
 
     let sprache = Language{nfa, new: vec![], current: vec![]};
-    let return_value = sprache.function(&mut word_to_check);
+    let return_value = sprache.function(word_to_check);
 
+
+    //the long prints have to be commented out for the mass test and need to be replaced by the short ones
     if return_value{
-        println!("Is the provided word is part of the language and can be therefore created by executing the created automata. \n");
+        //println!("The provided word is part of the language and can therefore be created by executing the created automata. \n");
+        println!("{}",return_value);
     }else{
-        println!("Is the provided word is NOT part of the language and can therefore NOT be created by executing the created automata! \n");
+        //println!("The provided word is NOT part of the language and can therefore NOT be created by executing the created automata! \n");
+        println!("{}",return_value);
     }
 }

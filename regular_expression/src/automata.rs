@@ -189,7 +189,8 @@ pub fn  run (exp: Exp)->NFA{
     let my_transformworker = TransformWorker{name_supply: 0};
     let my_nfa = my_transformworker.transform(&exp);
 
-   println!("This is the created NFA (not that readable):\n{:?}\n", my_nfa); //for debugging or display
+    //this needs to be commented out to run the mass
+    //println!("This is the created NFA (not that readable):\n{:?}\n", my_nfa); //for debugging or display
 
    //return the created nfa
    *my_nfa

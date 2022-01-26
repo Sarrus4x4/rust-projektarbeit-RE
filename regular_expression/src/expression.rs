@@ -153,7 +153,7 @@ fn is_eps(x: &Exp)->bool{
 
 
 
-pub fn run()-> Exp {
+pub fn run(test_expression: Exp)-> Exp {
    
     //### This are my building blocks ###
     // Box::new(Exp::Char{val : 'a'})  
@@ -163,23 +163,39 @@ pub fn run()-> Exp {
     // Box::new(Exp::Alt{left: , right: })
     // Box::new(Exp::Star{obj: })
     
-    //This needs to be displayed correctly: eps ((a*)* (phi | b)) -> (a*) b
-    //let test_expression = Box::new(Exp::Conc{left: Box::new(Exp::Eps{}) , right: Box::new(Exp::Conc{left: Box::new(Exp::Star{obj: Box::new(Exp::Star{obj: Box::new(Exp::Char{val : 'a'})}) }) , right: Box::new(Exp::Alt{left: Box::new(Exp::Phi{}) , right: Box::new(Exp::Char{val : 'b'}) })}) });
-
+    //this expression is equal to: eps ((a*)* (phi | b)) or even better (a*) b
     let test_expression = Box::new(Exp::Conc{
-        left: Box::new(Exp::Star{
-            obj: Box::new(Exp::Alt{
-                left: Box::new(Exp::Char{val: 'a'}),
-                right: Box::new(Exp::Eps{})
+        left: Box::new(Exp::Eps{}) , 
+        right: Box::new(Exp::Conc{
+            left: Box::new(Exp::Star{
+                obj: Box::new(Exp::Star{
+                    obj: Box::new(Exp::Char{val : 'a'})
+                }) 
+            }), 
+            right: Box::new(Exp::Alt{
+                left: Box::new(Exp::Phi{}), 
+                right: Box::new(Exp::Char{val : 'b'}) 
             })
-        }),
-        right: Box::new(Exp::Char{val: 'b'})
+        }) 
     });
+
+    //this expression is equal to: (b|eps)* c
+    // let test_expression = Box::new(Exp::Conc{
+    //     left: Box::new(Exp::Star{
+    //         obj: Box::new(Exp::Alt{
+    //             left: Box::new(Exp::Char{val: 'b'}),
+    //             right: Box::new(Exp::Eps{})
+    //         })
+    //     }),
+    //     right: Box::new(Exp::Char{val: 'c'})
+    // });
     
     let simplified_expression = simplify(&test_expression);
 
-    println!("This is the expression tree:\n{:?} \n",simplified_expression);
-    println!("This is the readable expression:\n{:?} \n",pretty(&simplified_expression));
+
+    //this needs to be commented out to run the mass
+    // println!("This is the expression tree:\n{:?} \n",simplified_expression);
+    // println!("This is the readable expression:\n{:?} \n",pretty(&simplified_expression));
 
     //return the simplified expression
     simplified_expression

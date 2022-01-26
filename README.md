@@ -266,6 +266,8 @@ Um die Überprüfung zu realisieren wird eine Struct **Language** verwendet, die
 ```
 Bei **current** handelt es sich um eine Liste an Zuständen, in denen man sich bei der Ausführung des Automaten befindet. Der Parameter **new** wird dabei verwendet um hinzukommende Zustände zu verwalten. Zuletzt ist **nfa** der Automat für den überprüft werden soll, ob sich ein bestimmtes Wort damit bilden lässt. 
 
+Die Funktionalität läuft in etwa forlendermaßen ab:
+- Beginnend im Startzustand wird Buchstabe für Buchstabe das zu prüfende Wort 'konsumiert' und überprüft, in welchen Zuständen man sich danach befinden könnte.
+- Ist nach Ablauf der Wortlänge  ein Endzustand in der Menge möglicher Zustände, so handelt es sich bei dem zu prüfenden Wort um einen Teil der Sprache die vom Automaten erschaffen wird.
+- Ist nach Ablauf der Wortlänge jedoch kein Endzustand in der Menge möglicher Zustände vorhanden, so ist das zu prüfende Wort auch nicht in der erzeugten Sprache enthalten. 
 
-
-....Rest der Dokumentation wird in Kürze ergänzt!
