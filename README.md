@@ -1,5 +1,5 @@
 # **Rust-Projektarbeit-Reguläre-Ausdrücke**
-In diesem Github Repository verwaltet David B. (beda1044) den Fortschritt seiner Projektarbeit zum Thema Rust und Reguläre Ausdrücke sowie deren Umwandlung in endliche Automaten.
+In diesem [Github Repository](https://github.com/Sarrus4x4/rust-projektarbeit-RE) verwaltet David B. (beda1044) den Fortschritt seiner Projektarbeit zum Thema Rust und Reguläre Ausdrücke sowie deren Umwandlung in endliche Automaten.
 
 Informationen über Rust habe ich hierbei aus einer Vielzahl and Tutorials und der [offiziellen Rust Dokumentation](https://doc.rust-lang.org/) entnommen.
 
